@@ -16,7 +16,7 @@ export function BoardList() {
         setBoardList(res.data);
       })
       .catch((err) => {
-        console.log("잘 안될 때 코드");
+        console.log("잘 안될 때 코드", err);
       })
       .finally(() => {
         console.log("항상 실행 코드");
