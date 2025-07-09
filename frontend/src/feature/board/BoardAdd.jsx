@@ -30,7 +30,7 @@ export function BoardAdd() {
         if (message) {
           toast(message.text, { type: message.type });
         }
-        // list 로 이동
+        // list 로 이동 : 화면 전환 용 함수. 프론트 엔드에서 쓰기 때문에 앞에 /api 안붙임 -> 서버통신 백엔드 전용
         navigate("/board/list");
       })
       .catch((err) => {
@@ -94,7 +94,7 @@ export function BoardAdd() {
             onClick={handleSaveButtonClick}
             disabled={isProcessing || !validate}
           >
-            {isProcessing && <Spinner />}
+            {isProcessing && <Spinner size="sm" />}
             {isProcessing || "저장"}
           </Button>
         </div>
