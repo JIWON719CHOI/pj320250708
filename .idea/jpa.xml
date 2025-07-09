@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JpaBuddyIdeaProjectConfig" newRepositoryParent="org.springframework.data.jpa.repository.JpaRepository" />
+  <component name="JpaPluginProjectSettings" reUseValidationAnnotation="false" reExcludeTablePrefixes="" reExcludeColumnPrefixes="" reExcludeTableSuffixes="" reExcludeColumnSuffixes="">
+    <option name="entityNameTemplate" />
+    <option name="isLombokToString" value="true" />
+    <option name="reUseLazyOnToOneAssociations" value="false" />
+    <option name="scaffoldingLanguage" />
+  </component>
+</project>
