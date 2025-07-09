@@ -75,7 +75,7 @@ export function BoardList() {
                   >
                     {board.author}
                   </td>
-                  <td style={{ width: "200px" }}>{board.timesAgo}</td>
+                  <td style={{ width: "125px" }}>{board.timesAgo}</td>
                 </tr>
               ))}
             </tbody>
