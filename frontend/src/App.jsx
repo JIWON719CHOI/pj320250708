@@ -8,7 +8,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainLayout />}>
-          <Route path="board/list" index element={<BoardLayout />} />
+          <Route index element={<BoardLayout />} />
+          <Route path="board/list" element={<BoardLayout />} />
           <Route path="board/add" element={<BoardAdd />} />
         </Route>
       </Routes>

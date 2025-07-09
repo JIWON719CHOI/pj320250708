@@ -31,7 +31,7 @@ export function BoardAdd() {
           toast(message.text, { type: message.type });
         }
         // list 로 이동
-        navigate("/api/board/list");
+        navigate("/board/list");
       })
       .catch((err) => {
         const message = err.response.data.message;
@@ -44,6 +44,16 @@ export function BoardAdd() {
         console.log("ALWAYS");
         setIsProcessing(false);
       });
+  }
+
+  // 작성자, 제목, 본문 썼는지
+  let validate = true;
+  if (title.trim() === "") {
+    validate = false;
+  } else if (content.trim() === "") {
+    validate = false;
+  } else if (author.trim() === "") {
+    validate = false;
   }
 
   return (
@@ -80,7 +90,10 @@ export function BoardAdd() {
           </FormGroup>
         </div>
         <div className="mb-3">
-          <Button onClick={handleSaveButtonClick}>
+          <Button
+            onClick={handleSaveButtonClick}
+            disabled={isProcessing || !validate}
+          >
             {isProcessing && <Spinner />}
             {isProcessing || "저장"}
           </Button>
