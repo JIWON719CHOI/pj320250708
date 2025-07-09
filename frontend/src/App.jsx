@@ -1,6 +1,13 @@
-import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+import {
+  BrowserRouter,
+  Outlet,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router";
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function MainLayout() {
   return (
@@ -30,17 +37,25 @@ function BoardAdd() {
   const [content, setContent] = useState("");
   const [author, setAuthor] = useState("");
 
+  const navigate = useNavigate();
+
   function handleSaveButtonClick() {
     axios
       .post("/api/board/add", { title, content, author })
       .then((res) => {
-        console.log("GOOD", res);
+        const message = res.data.message;
+        // toast 띄우기
+        if (message) {
+          toast(message.text, { type: message.type });
+        }
+        // "/" 로 이동
+        navigate("/");
       })
       .catch((err) => {
         console.log("ERROR:", err);
       })
       .finally(() => {
-        console.log("ALWAYS_RUN_CODE");
+        console.log("ALWAYS");
       });
   }
 
