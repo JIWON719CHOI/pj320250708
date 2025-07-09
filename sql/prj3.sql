@@ -7,3 +7,14 @@ CREATE TABLE board
     inserted_at datetime DEFAULT NOW() NOT NULL,
     CONSTRAINT pk_board PRIMARY KEY (id)
 );
+
+ALTER TABLE board
+    MODIFY COLUMN content TEXT NOT NULL;
+
+ALTER TABLE board
+    MODIFY COLUMN title VARCHAR(200) NOT NULL;
+
+ALTER TABLE board
+    MODIFY COLUMN author VARCHAR(50) NOT NULL;
+
+
