@@ -44,4 +44,16 @@ public class BoardService {
     public List<BoardListInfo> list() {
         return boardRepository.findAllByOrderByIdDesc();
     }
+
+    public BoardDto getBoardById(Integer id) {
+        Board board = boardRepository.findById(id).get();
+        BoardDto boardDto = new BoardDto();
+        boardDto.setId(board.getId());
+        boardDto.setInsertedAt(board.getInsertedAt());
+        boardDto.setTitle(board.getTitle());
+        boardDto.setContent(board.getContent());
+        boardDto.setAuthor(board.getAuthor());
+
+        return boardDto;
+    }
 }
