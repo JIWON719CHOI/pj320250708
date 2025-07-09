@@ -1,5 +1,7 @@
-package com.example.backend;
+package com.example.backend.board.controller;
 
+import com.example.backend.board.service.BoardService;
+import com.example.backend.board.dto.BoardDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
