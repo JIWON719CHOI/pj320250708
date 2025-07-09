@@ -8,6 +8,7 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
+  Modal,
   Row,
   Spinner,
 } from "react-bootstrap";
@@ -16,6 +17,7 @@ export function BoardDetail() {
   const [board, setBoard] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [modalShow, setModalShow] = useState(false);
 
   useEffect(() => {
     // axios로 해당 게시물 가져오기
@@ -26,7 +28,7 @@ export function BoardDetail() {
         setBoard(res.data);
       })
       .catch((err) => {
-        console.log("안됨");
+        console.log("안됨", err);
         toast("해당 게시물이 없습니다.", { type: "warning" });
       })
       .finally(() => {
@@ -51,7 +53,7 @@ export function BoardDetail() {
         navigate("/board/list");
       })
       .catch((err) => {
-        console.log("ERROR");
+        console.log("ERROR", err);
         toast("게시물이 삭제되지 않았습니다.", { type: "warning" });
       })
       .finally(() => {
@@ -98,7 +100,7 @@ export function BoardDetail() {
         </div>
         <div>
           <Button
-            onClick={handleDeleteButtonClick}
+            onClick={() => setModalShow(true)}
             className="me-2"
             variant="outline-danger"
           >
@@ -107,6 +109,20 @@ export function BoardDetail() {
           <Button variant="outline-info">수정</Button>
         </div>
       </Col>
+      <Modal show={modalShow} onHide={() => setModalShow(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>게시물 삭제 확인</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{board.id}번 게시물을 삭제하시겠습니까?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-dark" onClick={() => setModalShow(false)}>
+            취소
+          </Button>
+          <Button variant="danger" onClick={handleDeleteButtonClick}>
+            삭제
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Row>
   );
 }
