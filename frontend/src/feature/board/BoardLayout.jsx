@@ -1,7 +1,7 @@
 export function BoardLayout() {
   return (
     <div>
-      <h3>BOARD_LIST</h3>
+      <h3>게시판</h3>
     </div>
   );
 }

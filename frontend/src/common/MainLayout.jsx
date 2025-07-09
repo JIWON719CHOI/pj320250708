@@ -1,16 +1,16 @@
 import { Outlet } from "react-router";
+import { AppNavBar } from "./AppNavBar.jsx";
+import { Container } from "react-bootstrap";
 
 export function MainLayout() {
   return (
     <div>
-      <div>
-        navbar
-        <a href="/frontend/public">HOME</a>
-        <a href="/board/add">WRITE</a>
+      <div className="mb-3">
+        <AppNavBar />
       </div>
-      <div>
+      <Container>
         <Outlet />
-      </div>
+      </Container>
     </div>
   );
 }

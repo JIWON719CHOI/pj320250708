@@ -24,4 +24,18 @@ public class BoardService {
         // repository 에 save 실행
         boardRepository.save(board);
     }
+
+    public boolean validate(BoardDto dto) {
+        if (dto.getTitle() == null || dto.getTitle().trim().isBlank()) {
+            return false;
+        }
+        if (dto.getContent() == null || dto.getContent().trim().isBlank()) {
+            return false;
+        }
+        if (dto.getAuthor() == null || dto.getAuthor().trim().isBlank()) {
+            return false;
+        }
+        return true;
+    }
+
 }
