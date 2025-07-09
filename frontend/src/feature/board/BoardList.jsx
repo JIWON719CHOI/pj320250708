@@ -32,10 +32,10 @@ export function BoardList() {
         {boardList.length > 0 ? (
           <Table striped={true} hover={true}>
             <colgroup>
-              <col style={{ width: "90px" }} />
+              <col style={{ width: "60px" }} />
               <col style={{}} />
-              <col style={{ width: "200px" }} />
-              <col style={{ width: "200px" }} />
+              <col style={{ width: "125px" }} />
+              <col style={{ width: "100px" }} />
             </colgroup>
             <thead>
               <tr>
@@ -51,7 +51,7 @@ export function BoardList() {
                   <td>{board.id}</td>
                   <td>{board.title}</td>
                   <td>{board.author}</td>
-                  <td>{board.insertedAt}</td>
+                  <td>{board.timesAgo}</td>
                 </tr>
               ))}
             </tbody>
