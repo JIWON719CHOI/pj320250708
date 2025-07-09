@@ -19,7 +19,7 @@ public class BoardController {
 
     @PostMapping("add")
     @ResponseBody
-    public ResponseEntity<Object> add(@RequestBody BoardDto dto) {
+    public ResponseEntity<?> add(@RequestBody BoardDto dto) {
         // 값들이 유효한지 확인
         boolean result = boardService.validate(dto);
 
@@ -45,5 +45,13 @@ public class BoardController {
     @GetMapping("{id}")
     public BoardDto getBoardById(@PathVariable Integer id) {
         return boardService.getBoardById(id);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteBoardById(@PathVariable Integer id) {
+        boardService.deleteById(id);
+        return ResponseEntity.ok().body(Map.of(
+                "message", Map.of("type", "success",
+                        "text", id + "번 게시물이 삭제되었습니다.")));
     }
 }
