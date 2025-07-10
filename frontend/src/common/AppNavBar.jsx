@@ -18,6 +18,9 @@ export function AppNavBar() {
               <Nav.Link as={NavLink} to="/board/add">
                 WRITE
               </Nav.Link>
+              <Nav.Link as={NavLink} to="/signup">
+                SIGNUP
+              </Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
