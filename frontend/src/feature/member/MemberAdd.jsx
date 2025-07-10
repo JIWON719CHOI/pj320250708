@@ -4,20 +4,27 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
+  FormText,
   Row,
+  Spinner,
 } from "react-bootstrap";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 export function MemberAdd() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
   const [nickName, setNickName] = useState("");
   const [info, setInfo] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const navigate = useNavigate();
 
   function handleSaveClick() {
     // post /api/member/add, {email, password, nickName, info}
+    setIsProcessing(true);
     axios
       .post("/api/member/add", {
         email: email,
@@ -31,6 +38,7 @@ export function MemberAdd() {
         if (message) {
           toast(message.text, { type: message.type });
         }
+        navigate("/");
       })
       .catch((err) => {
         console.log("bad");
@@ -41,7 +49,27 @@ export function MemberAdd() {
       })
       .finally(() => {
         console.log("always");
+        setIsProcessing(false);
       });
+  }
+
+  // 이메일 암호 별명 입력 하지 않으면 가입버튼 비활성화
+  let disabled = false;
+  if (email === "") {
+    disabled = true;
+  }
+  if (password === "") {
+    disabled = true;
+  }
+  if (nickName === "") {
+    disabled = true;
+  }
+
+  // 비밀번호 일치하지 않으면 가입버튼 비활성화
+  let passwordConfirm = true;
+  if (password !== password2) {
+    disabled = true;
+    passwordConfirm = false;
   }
 
   return (
@@ -52,38 +80,43 @@ export function MemberAdd() {
           <FormGroup className="mb-3" controlId="email1">
             <FormLabel>이메일</FormLabel>
             <FormControl
-              type="email"
+              type="text"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value.replace(/\s/g, ""))}
             />
           </FormGroup>
         </div>
         <div>
           <FormGroup className="mb-3" controlId="password1">
             <FormLabel>암호</FormLabel>
-            {/*type은 password 인데 보이도록 text로 둠*/}
             <FormControl
-              type="text"
+              type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
             />
           </FormGroup>
         </div>
         <div>
           <FormGroup className="mb-3" controlId="password2">
-            {/* TODO: 나중에 적용 */}
             <FormLabel>암호 확인</FormLabel>
-            {/*type은 password 인데 보이도록 text로 둠*/}
-            <FormControl type="text" />
+            <FormControl
+              type="password"
+              value={password2}
+              onChange={(e) => setPassword2(e.target.value.replace(/\s/g, ""))}
+            />
+            {passwordConfirm || (
+              <FormText className="text-danger">
+                비밀번호가 일치하지 않습니다.
+              </FormText>
+            )}
           </FormGroup>
         </div>
         <div>
           <FormGroup className="mb-3" controlId="nickName1">
             <FormLabel>별명</FormLabel>
             <FormControl
-              type="text"
               value={nickName}
-              onChange={(e) => setNickName(e.target.value)}
+              onChange={(e) => setNickName(e.target.value.replace(/\s/g, ""))}
             />
           </FormGroup>
         </div>
@@ -99,7 +132,9 @@ export function MemberAdd() {
           </FormGroup>
         </div>
         <div className="mb-3">
-          <Button onClick={handleSaveClick}>가입</Button>
+          <Button onClick={handleSaveClick} disabled={isProcessing || disabled}>
+            {isProcessing && <Spinner size="sm" />}가입
+          </Button>
         </div>
       </Col>
     </Row>
