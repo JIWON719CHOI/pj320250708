@@ -80,4 +80,27 @@ public class MemberService {
 
         return memberDto;
     }
+
+    public void delete(MemberForm memberForm) {
+        Member db = memberRepository.findById(memberForm.getEmail()).get();
+        if (db.getPassword().equals(memberForm.getPassword())) {
+            memberRepository.delete(db);
+        } else {
+            throw new RuntimeException("암호가 일치하지 않습니다.");
+        }
+    }
+
+    public void update(MemberForm memberForm) {
+        // 조회
+        Member db = memberRepository.findById(memberForm.getEmail()).get();
+        // 암호 확인
+        if (!db.getPassword().equals(memberForm.getPassword())) {
+            throw new RuntimeException("암호가 일치하지 않습니다.");
+        }
+        // 변경
+        db.setNickName(memberForm.getNickName());
+        db.setInfo(memberForm.getInfo());
+        // 저장
+        memberRepository.save(db);
+    }
 }

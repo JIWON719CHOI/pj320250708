@@ -68,7 +68,7 @@ export function BoardDetail() {
         <div>
           <FormGroup className="mb-3" controlId="title1">
             <FormLabel>제목</FormLabel>
-            <FormControl readOnly={true} value={board.title} />
+            <FormControl readOnly value={board.title} />
           </FormGroup>
         </div>
         <div>
@@ -77,7 +77,7 @@ export function BoardDetail() {
             <FormControl
               as="textarea"
               rows={6}
-              readOnly={true}
+              readOnly
               value={board.content}
             />
           </FormGroup>
@@ -85,7 +85,7 @@ export function BoardDetail() {
         <div>
           <FormGroup className="mb-3" controlId="author1">
             <FormLabel>작성자</FormLabel>
-            <FormControl readOnly={true} value={board.author} />
+            <FormControl readOnly value={board.author} />
           </FormGroup>
         </div>
         <div>
@@ -93,7 +93,7 @@ export function BoardDetail() {
             <FormLabel>작성일시</FormLabel>
             <FormControl
               type="datetime-local"
-              readOnly={true}
+              readOnly
               value={board.insertedAt}
             />
           </FormGroup>

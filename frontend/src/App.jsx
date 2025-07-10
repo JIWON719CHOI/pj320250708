@@ -8,12 +8,9 @@ import { BoardEdit } from "./feature/board/BoardEdit.jsx";
 import { MemberAdd } from "./feature/member/MemberAdd.jsx";
 import { MemberList } from "./feature/member/MemberList.jsx";
 import { MemberDetail } from "./feature/member/MemberDetail.jsx";
+import { MemberEdit } from "./feature/member/MemberEdit.jsx";
 
 function MemberLogin() {
-  return null;
-}
-
-function MemberEdit() {
   return null;
 }
 
@@ -23,15 +20,15 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<BoardLayout />} />
-          <Route path="board/list" element={<BoardList />} />
-          <Route path="board/add" element={<BoardAdd />} />
-          <Route path="board/:id" element={<BoardDetail />} />
-          <Route path="board/edit" element={<BoardEdit />} />
+          <Route path="/board/list" element={<BoardList />} />
+          <Route path="/board/add" element={<BoardAdd />} />
+          <Route path="/board/:id" element={<BoardDetail />} />
+          <Route path="/board/edit" element={<BoardEdit />} />
           <Route path="/signup" element={<MemberAdd />} />
           <Route path="/signin" element={<MemberLogin />} />
-          <Route path="member/list" element={<MemberList />} />
+          <Route path="/member/list" element={<MemberList />} />
           <Route path="/member" element={<MemberDetail />} />
-          <Route path="member/edit" element={<MemberEdit />} />
+          <Route path="/member/edit" element={<MemberEdit />} />
         </Route>
       </Routes>
     </BrowserRouter>

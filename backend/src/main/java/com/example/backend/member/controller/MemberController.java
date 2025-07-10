@@ -43,7 +43,43 @@ public class MemberController {
     }
 
     @GetMapping(params = "email")
-    public MemberDto getMember(String email) {
+    public MemberDto get(String email) {
         return memberService.get(email);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> delete(@RequestBody MemberForm memberForm) {
+        try {
+            memberService.delete(memberForm);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = e.getMessage();
+            return ResponseEntity.status(403).body( // 권한 없음
+                    Map.of("message",
+                            Map.of("type", "error",
+                                    "text", message)));
+        }
+        return ResponseEntity.ok().body(
+                Map.of("message",
+                        Map.of("type", "success",
+                                "text", "회원 정보가 삭제되었습니다.")));
+    }
+
+    @PutMapping
+    public ResponseEntity<?> update(@RequestBody MemberForm memberForm) {
+        try {
+            memberService.update(memberForm);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = e.getMessage();
+            return ResponseEntity.status(403).body( // 권한 없음
+                    Map.of("message",
+                            Map.of("type", "error",
+                                    "text", message)));
+        }
+        return ResponseEntity.ok().body(
+                Map.of("message",
+                        Map.of("type", "success",
+                                "text", "회원 정보가 수정되었습니다.")));
     }
 }
