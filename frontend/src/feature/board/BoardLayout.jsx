@@ -1,4 +1,5 @@
 import { Accordion, Carousel, Tab, Tabs } from "react-bootstrap";
+import { BoardListMini } from "./BoardListMini.jsx";
 
 export function BoardLayout() {
   return (
@@ -41,23 +42,23 @@ export function BoardLayout() {
         </Carousel.Item>
       </Carousel>
 
-      <Tabs defaultActiveKey="home" className="my-4">
-        <Tab eventKey="notice" title="공지사항">
+      <Tabs defaultActiveKey="2" className="my-4">
+        <Tab eventKey="1" title="공지사항">
           <p>뭐뭐뭐</p>
         </Tab>
-        <Tab eventKey="new" title="최신글">
-          <p>뫄뫄뫄</p>
+        <Tab eventKey="2" title="최신글">
+          <BoardListMini />
         </Tab>
       </Tabs>
 
       <Accordion defaultActiveKey="0" className="my-3">
-        <Accordion.Item eventKey="0">
+        <Accordion.Item eventKey="1">
           <Accordion.Header>자주 묻는 질문</Accordion.Header>
           <Accordion.Body>
             React-Bootstrap은 Bootstrap 컴포넌트를 React 방식으로 제공합니다.
           </Accordion.Body>
         </Accordion.Item>
-        <Accordion.Item eventKey="1">
+        <Accordion.Item eventKey="2">
           <Accordion.Header>사용법은 어렵나요?</Accordion.Header>
           <Accordion.Body>아주 쉽습니다. 그대로 쓰면 돼요.</Accordion.Body>
         </Accordion.Item>

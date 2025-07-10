@@ -4,9 +4,9 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 export function AppNavBar() {
   return (
     <div>
-      <Navbar expand="lg" className="bg-body-tertiary">
-        <Container>
-          <Navbar.Brand to="/" as={Link}>
+      <Navbar expand="lg" className="bg-body-tertiary" fixed="top">
+        <Container className="flex-grow-1">
+          <Navbar.Brand to="/" as={Link} className="fs-3 fw-bold">
             PRJ3
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />

@@ -34,36 +34,55 @@ public class MemberService {
     }
 
     private boolean validate(MemberForm memberForm) {
-        // 이미 있는 email 인지
-        Optional<Member> db1 = memberRepository.findById(memberForm.getEmail());
-        if (db1.isPresent()) {
-            throw new RuntimeException("이미 가입된 이메일입니다.");
-        }
-        // 이미 있는 nickName 인지
-        Optional<Member> db2 = memberRepository.findByNickName(memberForm.getNickName());
-        if (db2.isPresent()) {
-            throw new RuntimeException("이미 가입된 닉네임입니다.");
-        }
+        String email = memberForm.getEmail().trim();
+        String password = memberForm.getPassword().trim();
+        String nickName = memberForm.getNickName().trim();
 
-        // email 있는 지?
-        if (memberForm.getEmail().trim().isBlank()) {
+        // 1. 이메일: 비어 있는지 + 형식 + 중복
+        if (email.isBlank()) {
             throw new RuntimeException("이메일을 입력해야 합니다.");
         }
-        // 형식에 맞는 지?
-        String email = memberForm.getEmail();
-        if (!Pattern.matches("[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}", email)) {
+
+        // 이메일 형식 (RFC 5322 간단 버전)
+        String emailRegex = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$";
+        if (!Pattern.matches(emailRegex, email)) {
             throw new RuntimeException("이메일 형식에 맞지 않습니다.");
         }
-        // password 있는 지?
-        if (memberForm.getPassword().isBlank()) {
-            throw new RuntimeException("패스워드를 입력해야 합니다.");
+
+        // 중복 이메일
+        if (memberRepository.findById(email).isPresent()) {
+            throw new RuntimeException("이미 가입된 이메일입니다.");
         }
-        // nickName 있는 지?
-        if (memberForm.getNickName().isBlank()) {
-            throw new RuntimeException("별명을 입력해야 합니다.");
+
+        // 2. 비밀번호: 비어 있는지 + 복잡도
+        if (password.isBlank()) {
+            throw new RuntimeException("비밀번호를 입력해야 합니다.");
         }
+
+        // 8자 이상, 영문 대/소문자, 숫자, 특수문자 1개 이상 포함
+        String pwRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,}$";
+        if (!Pattern.matches(pwRegex, password)) {
+            throw new RuntimeException("비밀번호는 8자 이상이며, 영문 대소문자, 숫자, 특수문자를 포함해야 합니다.");
+        }
+
+        // 3. 닉네임: 비어 있는지 + 형식 + 중복
+        if (nickName.isBlank()) {
+            throw new RuntimeException("닉네임을 입력해야 합니다.");
+        }
+
+        // 닉네임: 한글, 영문, 숫자만 허용, 2~20자
+        String nickRegex = "^[가-힣a-zA-Z0-9]{2,20}$";
+        if (!Pattern.matches(nickRegex, nickName)) {
+            throw new RuntimeException("닉네임은 2~20자이며, 한글, 영문, 숫자만 사용할 수 있습니다.");
+        }
+
+        if (memberRepository.findByNickName(nickName).isPresent()) {
+            throw new RuntimeException("이미 사용 중인 닉네임입니다.");
+        }
+
         return true;
     }
+
 
     public List<MemberListInfo> list() {
         return memberRepository.findAllBy();
