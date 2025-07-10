@@ -20,7 +20,6 @@ public class MemberController {
 
     @PostMapping("add")
     public ResponseEntity<?> add(@RequestBody MemberForm memberForm) {
-//        System.out.println("memberForm = " + memberForm);
         try {
             memberService.add(memberForm);
         } catch (Exception e) {
@@ -31,12 +30,10 @@ public class MemberController {
                             Map.of("type", "error",
                                     "text", message)));
         }
-
         return ResponseEntity.ok().body(
                 Map.of("message",
                         Map.of("type", "success",
                                 "text", "회원 가입 되었습니다."))
         );
     }
-
 }

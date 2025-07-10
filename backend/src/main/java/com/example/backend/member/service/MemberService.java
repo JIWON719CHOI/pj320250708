@@ -28,7 +28,6 @@ public class MemberService {
 
             memberRepository.save(member);
         }
-
     }
 
     private boolean validate(MemberForm memberForm) {
@@ -60,8 +59,6 @@ public class MemberService {
         if (memberForm.getNickName().isBlank()) {
             throw new RuntimeException("별명을 입력해야 합니다.");
         }
-
-
         return true;
     }
 }
