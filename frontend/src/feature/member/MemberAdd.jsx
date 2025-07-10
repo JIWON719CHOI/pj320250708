@@ -82,6 +82,7 @@ export function MemberAdd() {
           <FormControl
             type="text"
             value={email}
+            maxLength={255}
             placeholder="예: user@example.com"
             onChange={(e) => setEmail(e.target.value.replace(/\s/g, ""))}
           />
@@ -98,6 +99,7 @@ export function MemberAdd() {
           <FormControl
             type="password"
             value={password}
+            maxLength={255}
             placeholder="8자 이상, 영문 대/소문자, 숫자, 특수문자 포함"
             onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
           />
@@ -115,6 +117,7 @@ export function MemberAdd() {
           <FormControl
             type="password"
             value={password2}
+            maxLength={255}
             placeholder="비밀번호를 다시 입력하세요"
             onChange={(e) => setPassword2(e.target.value.replace(/\s/g, ""))}
           />
@@ -130,6 +133,7 @@ export function MemberAdd() {
           <FormLabel>별명</FormLabel>
           <FormControl
             value={nickName}
+            maxLength={20}
             placeholder="2~20자, 한글/영문/숫자만 사용 가능"
             onChange={(e) => setNickName(e.target.value.replace(/\s/g, ""))}
           />
@@ -147,7 +151,8 @@ export function MemberAdd() {
             as="textarea"
             rows={6}
             value={info}
-            placeholder="자기 소개를 입력하세요 (선택)"
+            maxLength={3000}
+            placeholder="자기 소개를 입력하세요. 3000자 이내. (선택)"
             onChange={(e) => setInfo(e.target.value)}
           />
         </FormGroup>
