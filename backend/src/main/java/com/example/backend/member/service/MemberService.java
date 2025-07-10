@@ -1,12 +1,15 @@
 package com.example.backend.member.service;
 
+import com.example.backend.member.dto.MemberDto;
 import com.example.backend.member.dto.MemberForm;
+import com.example.backend.member.dto.MemberListInfo;
 import com.example.backend.member.entity.Member;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -60,5 +63,21 @@ public class MemberService {
             throw new RuntimeException("별명을 입력해야 합니다.");
         }
         return true;
+    }
+
+    public List<MemberListInfo> list() {
+        return memberRepository.findAllBy();
+    }
+
+    public MemberDto get(String email) {
+        Member db = memberRepository.findById(email).get();
+
+        MemberDto memberDto = new MemberDto();
+        memberDto.setEmail(db.getEmail());
+        memberDto.setNickName(db.getNickName());
+        memberDto.setInfo(db.getInfo());
+        memberDto.setInsertedAt(db.getInsertedAt());
+
+        return memberDto;
     }
 }

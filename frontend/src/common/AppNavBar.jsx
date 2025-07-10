@@ -13,13 +13,16 @@ export function AppNavBar() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link as={NavLink} to="/board/list">
-                LIST
+                게시판
               </Nav.Link>
               <Nav.Link as={NavLink} to="/board/add">
-                WRITE
+                작성
               </Nav.Link>
               <Nav.Link as={NavLink} to="/signup">
-                SIGNUP
+                가입
+              </Nav.Link>
+              <Nav.Link as={NavLink} to="/member/list">
+                목록
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
