@@ -1,37 +1,18 @@
-import { BrowserRouter, Route, Routes } from "react-router";
-import { MainLayout } from "./common/MainLayout.jsx";
-import { BoardLayout } from "./feature/board/BoardLayout.jsx";
-import { BoardAdd } from "./feature/board/BoardAdd.jsx";
-import { BoardList } from "./feature/board/BoardList.jsx";
-import { BoardDetail } from "./feature/board/BoardDetail.jsx";
-import { BoardEdit } from "./feature/board/BoardEdit.jsx";
-import { MemberAdd } from "./feature/member/MemberAdd.jsx";
-import { MemberDetail } from "./feature/member/MemberDetail.jsx";
-import { MemberList } from "./feature/member/MemberList.jsx";
-import { MemberEdit } from "./feature/member/MemberEdit.jsx";
-
-function MemberLogin() {
-  return null;
-}
+import axios from "axios";
 
 function App() {
+  function handleButton1Click() {
+    axios.post("/api/learn/jwt/sub1", {
+      email: "gojo@email.com",
+      password: "1207",
+    });
+  }
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<BoardLayout />} />
-          <Route path="/board/add" element={<BoardAdd />} />
-          <Route path="/board/list" element={<BoardList />} />
-          <Route path="/board/:id" element={<BoardDetail />} />
-          <Route path="/board/edit" element={<BoardEdit />} />
-          <Route path="/signup" element={<MemberAdd />} />
-          <Route path="/signin" element={<MemberLogin />} />
-          <Route path="/member" element={<MemberDetail />} />
-          <Route path="/member/list" element={<MemberList />} />
-          <Route path="/member/edit" element={<MemberEdit />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <div>
+      <h3>jwt 로그인 연습</h3>
+      <button onClick={handleButton1Click}>1. GET TOKEN🪙</button>
+    </div>
   );
 }
 
