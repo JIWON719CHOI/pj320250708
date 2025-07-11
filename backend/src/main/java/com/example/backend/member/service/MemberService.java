@@ -1,5 +1,6 @@
 package com.example.backend.member.service;
 
+import com.example.backend.member.dto.ChangePasswordForm;
 import com.example.backend.member.dto.MemberDto;
 import com.example.backend.member.dto.MemberForm;
 import com.example.backend.member.dto.MemberListInfo;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
@@ -121,5 +121,15 @@ public class MemberService {
         db.setInfo(memberForm.getInfo());
         // 저장
         memberRepository.save(db);
+    }
+
+    public void changePassword(ChangePasswordForm data) {
+        Member db = memberRepository.findById(data.getEmail()).get();
+        if (db.getPassword().equals(data.getOldPassword())) {
+            db.setPassword(data.getNewPassword());
+            memberRepository.save(db);
+        } else {
+            throw new RuntimeException("이전 비밀번호가 일치하지 않습니다.");
+        }
     }
 }

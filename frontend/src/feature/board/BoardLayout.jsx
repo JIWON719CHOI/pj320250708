@@ -53,14 +53,12 @@ export function BoardLayout() {
 
       <Accordion defaultActiveKey="0" className="my-3">
         <Accordion.Item eventKey="1">
-          <Accordion.Header>자주 묻는 질문</Accordion.Header>
-          <Accordion.Body>
-            React-Bootstrap은 Bootstrap 컴포넌트를 React 방식으로 제공합니다.
-          </Accordion.Body>
+          <Accordion.Header>지금 피곤한가요?</Accordion.Header>
+          <Accordion.Body>네.</Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="2">
-          <Accordion.Header>사용법은 어렵나요?</Accordion.Header>
-          <Accordion.Body>아주 쉽습니다. 그대로 쓰면 돼요.</Accordion.Body>
+          <Accordion.Header>집에 가고싶나요?</Accordion.Header>
+          <Accordion.Body>네.</Accordion.Body>
         </Accordion.Item>
       </Accordion>
     </div>

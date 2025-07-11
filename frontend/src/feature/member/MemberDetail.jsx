@@ -4,6 +4,7 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
+  FormText,
   Modal,
   Row,
   Spinner,
@@ -118,14 +119,24 @@ export function MemberDetail() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            ></FormControl>
+              placeholder="탈퇴 확인을 위해 비밀번호를 입력하세요"
+            />
+            {!password && (
+              <FormText className="text-danger">
+                탈퇴하려면 비밀번호를 입력해주세요.
+              </FormText>
+            )}
           </FormGroup>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="outline-dark" onClick={() => setModalShow(false)}>
             취소
           </Button>
-          <Button variant="danger" onClick={handleDeleteButtonClick}>
+          <Button
+            variant="danger"
+            onClick={handleDeleteButtonClick}
+            disabled={!password} // 🔐 비밀번호 입력이 없으면 비활성화
+          >
             탈퇴
           </Button>
         </Modal.Footer>
