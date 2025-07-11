@@ -175,7 +175,7 @@ export function MemberEdit() {
           </Button>
           <Button
             variant="primary"
-            disabled={isSaveDisabled}
+            disabled={!isNickNameValid}
             onClick={() => setModalShow(true)}
           >
             저장

@@ -101,8 +101,19 @@ public class MemberController {
     }
 
     @PostMapping("login")
-    public String login(@RequestBody MemberLoginForm loginForm) {
-        System.out.println("MemberController.login");
-        return null;
+    public ResponseEntity<?> login(@RequestBody MemberLoginForm loginForm) {
+        try {
+            String token = memberService.getToken(loginForm);
+            return ResponseEntity.ok().body(
+                    Map.of("token", token, "message",
+                            Map.of("type", "success",
+                                    "text", " 로그인 되었습니다.")));
+        } catch (Exception e) {
+            String message = e.getMessage();
+            return ResponseEntity.status(403).body( // 권한 없음
+                    Map.of("message",
+                            Map.of("type", "error",
+                                    "text", message)));
+        }
     }
 }
