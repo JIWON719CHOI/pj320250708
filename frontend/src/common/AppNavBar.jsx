@@ -18,11 +18,14 @@ export function AppNavBar() {
               <Nav.Link as={NavLink} to="/board/add">
                 작성
               </Nav.Link>
+              <Nav.Link as={NavLink} to="/member/list">
+                목록
+              </Nav.Link>
               <Nav.Link as={NavLink} to="/signup">
                 가입
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/member/list">
-                목록
+              <Nav.Link as={NavLink} to="/login">
+                로그인
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>

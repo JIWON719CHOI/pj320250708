@@ -9,10 +9,7 @@ import { MemberAdd } from "./feature/member/MemberAdd.jsx";
 import { MemberDetail } from "./feature/member/MemberDetail.jsx";
 import { MemberList } from "./feature/member/MemberList.jsx";
 import { MemberEdit } from "./feature/member/MemberEdit.jsx";
-
-function MemberLogin() {
-  return null;
-}
+import { MemberLogin } from "./feature/member/MemberLogin.jsx";
 
 function App() {
   return (
@@ -25,7 +22,7 @@ function App() {
           <Route path="/board/:id" element={<BoardDetail />} />
           <Route path="/board/edit" element={<BoardEdit />} />
           <Route path="/signup" element={<MemberAdd />} />
-          <Route path="/signin" element={<MemberLogin />} />
+          <Route path="/login" element={<MemberLogin />} />
           <Route path="/member" element={<MemberDetail />} />
           <Route path="/member/list" element={<MemberList />} />
           <Route path="/member/edit" element={<MemberEdit />} />

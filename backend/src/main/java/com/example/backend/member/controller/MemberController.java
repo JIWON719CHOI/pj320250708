@@ -1,9 +1,6 @@
 package com.example.backend.member.controller;
 
-import com.example.backend.member.dto.ChangePasswordForm;
-import com.example.backend.member.dto.MemberDto;
-import com.example.backend.member.dto.MemberForm;
-import com.example.backend.member.dto.MemberListInfo;
+import com.example.backend.member.dto.*;
 import com.example.backend.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -103,4 +100,9 @@ public class MemberController {
                                 "text", "비밀번호가 수정되었습니다.")));
     }
 
+    @PostMapping("login")
+    public String login(@RequestBody MemberLoginForm loginForm) {
+        System.out.println("MemberController.login");
+        return null;
+    }
 }
