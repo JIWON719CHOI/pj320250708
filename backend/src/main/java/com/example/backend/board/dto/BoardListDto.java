@@ -1,21 +1,18 @@
 package com.example.backend.board.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @AllArgsConstructor
-@NoArgsConstructor // ✅ 꼭 있어야 함
 @Getter
 public class BoardListDto {
     private Integer id;
     private String title;
-    private String author; // 👈 변경
+    private String author;
     private LocalDateTime insertedAt;
 
     public String getTimesAgo() {

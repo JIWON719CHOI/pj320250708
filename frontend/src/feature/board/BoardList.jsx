@@ -7,8 +7,21 @@ export function BoardList() {
   const [boardList, setBoardList] = useState(null);
   const navigate = useNavigate();
 
+  // 작성일시를 상대 시간 문자열로 바꿔주는 함수
+  function getTimesAgo(insertedAt) {
+    const now = new Date();
+    const past = new Date(insertedAt);
+    const diffSec = Math.floor((now - past) / 1000);
+
+    if (diffSec < 60) return "방금 전";
+    if (diffSec < 3600) return Math.floor(diffSec / 60) + "분 전";
+    if (diffSec < 86400) return Math.floor(diffSec / 3600) + "시간 전";
+    if (diffSec < 604800) return Math.floor(diffSec / 86400) + "일 전";
+    if (diffSec < 2419200) return Math.floor(diffSec / 604800) + "주 전";
+    return past.toLocaleDateString();
+  }
+
   useEffect(() => {
-    // 마운트될때(initial render 시) 실행되는 코드
     axios
       .get("/api/board/list")
       .then((res) => {
@@ -24,11 +37,9 @@ export function BoardList() {
   }, []);
 
   function handleTableRowClick(id) {
-    // 게시물 보기로 이동
     navigate(`/board/${id}`);
   }
 
-  // 아직 게시물 없으면 스피너 돌리기
   if (!boardList) {
     return <Spinner />;
   }
@@ -73,10 +84,10 @@ export function BoardList() {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {board.authorNickName}
+                    {board.author} {/* 필요시 authorNickName 으로 바꾸기 */}
                   </td>
                   <td style={{ width: "125px" }}>
-                    {new Date(board.insertedAt).toLocaleString()}
+                    {getTimesAgo(board.insertedAt)}
                   </td>
                 </tr>
               ))}

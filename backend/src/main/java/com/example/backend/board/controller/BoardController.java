@@ -1,6 +1,7 @@
 // ✅ BoardController.java - 완성본
 package com.example.backend.board.controller;
 
+import com.example.backend.board.dto.BoardListDto;
 import com.example.backend.board.dto.BoardDto;
 import com.example.backend.board.dto.BoardListInfo;
 import com.example.backend.board.service.BoardService;
@@ -35,14 +36,8 @@ public class BoardController {
 
     // ✅ 전체 목록 조회
     @GetMapping("/list")
-    public ResponseEntity<List<BoardListInfo>> list() {
-        try {
-            List<BoardListInfo> list = boardService.list();
-            return ResponseEntity.ok(list);
-        } catch (Exception e) {
-            // 로그 남기기
-            return ResponseEntity.status(500).build();
-        }
+    public List<BoardListDto> list() {
+        return boardService.list();
     }
 
 

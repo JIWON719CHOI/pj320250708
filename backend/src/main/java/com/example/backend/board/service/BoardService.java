@@ -1,6 +1,7 @@
 package com.example.backend.board.service;
 
 import com.example.backend.board.dto.BoardDto;
+import com.example.backend.board.dto.BoardListDto;
 import com.example.backend.board.dto.BoardListInfo;
 import com.example.backend.board.entity.Board;
 import com.example.backend.board.repository.BoardRepository;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +45,8 @@ public class BoardService {
                 && dto.getContent() != null && !dto.getContent().trim().isBlank();
     }
 
-    public List<BoardListInfo> list() {
-        return boardRepository.findAllByOrderByIdDesc();
+    public List<BoardListDto> list() {
+        return boardRepository.findAllBy();
     }
 
     public Optional<BoardDto> getBoardById(Integer id) {
