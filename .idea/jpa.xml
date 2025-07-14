@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="JpaBuddyIdeaProjectConfig" newRepositoryParent="org.springframework.data.jpa.repository.JpaRepository" />
+  <component name="JpaBuddyIdeaProjectConfig" newRepositoryParent="org.springframework.data.jpa.repository.JpaRepository">
+    <option name="reLastEntityCreationPackage" value="backend/src/main/java/com/example/backend/auth/entity" />
+    <option name="reverseEngineeringLastDbConnectionId" value="727308aa-799b-49d9-97c9-cb03c885eafb" />
+  </component>
   <component name="JpaPluginProjectSettings" reUseValidationAnnotation="false" reExcludeTablePrefixes="" reExcludeColumnPrefixes="" reExcludeTableSuffixes="" reExcludeColumnSuffixes="">
     <option name="entityNameTemplate" />
     <option name="isLombokToString" value="true" />

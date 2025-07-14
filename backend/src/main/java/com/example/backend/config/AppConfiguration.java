@@ -27,6 +27,7 @@ import java.security.interfaces.RSAPublicKey;
 public class AppConfiguration {
     @Value("classpath:secret/public.pem")
     private RSAPublicKey publicKey;
+
     @Value("classpath:secret/private.pem")
     private RSAPrivateKey privateKey;
 
@@ -51,9 +52,9 @@ public class AppConfiguration {
         return new NimbusJwtEncoder(jwks);
     }
 
-    // 🔐암호화
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

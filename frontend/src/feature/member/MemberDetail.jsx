@@ -4,7 +4,6 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
-  FormText,
   Modal,
   Row,
   Spinner,
@@ -19,10 +18,12 @@ export function MemberDetail() {
   const [member, setMember] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
-  const [params] = useSearchParams();
-  const navigate = useNavigate();
 
-  const { logout } = useContext(AuthenticationContext);
+  const { logout, hasAccess } = useContext(AuthenticationContext);
+
+  const [params] = useSearchParams();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -47,9 +48,8 @@ export function MemberDetail() {
         console.log("good");
         const message = res.data.message;
         toast(message.text, { type: message.type });
-
-        logout(); // 🔐 로그아웃 처리 추가
-        navigate("/"); // 홈으로 이동
+        navigate("/");
+        logout();
       })
       .catch((err) => {
         console.log("bad");
@@ -90,26 +90,32 @@ export function MemberDetail() {
           </FormGroup>
         </div>
         <div>
-          <FormGroup controlId="insertedAt1" className="mb-3">
+          <FormGroup controlId="inserted1" className="mb-3">
             <FormLabel>가입일시</FormLabel>
-            <FormControl readOnly value={member.insertedAt} />
+            <FormControl
+              type="datetime-local"
+              readOnly
+              value={member.insertedAt}
+            />
           </FormGroup>
         </div>
-        <div>
-          <Button
-            variant="outline-danger"
-            className="me-2"
-            onClick={() => setModalShow(true)}
-          >
-            탈퇴
-          </Button>
-          <Button
-            variant="outline-info"
-            onClick={() => navigate(`/member/edit?email=${member.email}`)}
-          >
-            수정
-          </Button>
-        </div>
+        {hasAccess(member.email) && (
+          <div>
+            <Button
+              variant="outline-danger"
+              className="me-2"
+              onClick={() => setModalShow(true)}
+            >
+              탈퇴
+            </Button>
+            <Button
+              variant="outline-info"
+              onClick={() => navigate(`/member/edit?email=${member.email}`)}
+            >
+              수정
+            </Button>
+          </div>
+        )}
       </Col>
 
       {/*   삭제 확인 모달 */}
@@ -124,24 +130,14 @@ export function MemberDetail() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="탈퇴 확인을 위해 비밀번호를 입력하세요"
-            />
-            {!password && (
-              <FormText className="text-danger">
-                탈퇴하려면 비밀번호를 입력해주세요.
-              </FormText>
-            )}
+            ></FormControl>
           </FormGroup>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="outline-dark" onClick={() => setModalShow(false)}>
             취소
           </Button>
-          <Button
-            variant="danger"
-            onClick={handleDeleteButtonClick}
-            disabled={!password} // 🔐 비밀번호 입력이 없으면 비활성화
-          >
+          <Button variant="danger" onClick={handleDeleteButtonClick}>
             탈퇴
           </Button>
         </Modal.Footer>

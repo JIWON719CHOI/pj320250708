@@ -68,13 +68,13 @@ export function BoardEdit() {
   }
 
   let validate = true;
-  if (board.title.trim() === "") {
+  if ((board.title ?? "").trim() === "") {
     validate = false;
   }
-  if (board.content.trim() === "") {
+  if ((board.content ?? "").trim() === "") {
     validate = false;
   }
-  if (board.author.trim() === "") {
+  if ((board.author ?? "").trim() === "") {
     validate = false;
   }
 

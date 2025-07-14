@@ -1,9 +1,8 @@
 // ✅ BoardController.java - 완성본
 package com.example.backend.board.controller;
 
-import com.example.backend.board.dto.BoardListDto;
 import com.example.backend.board.dto.BoardDto;
-import com.example.backend.board.dto.BoardListInfo;
+import com.example.backend.board.dto.BoardListDto;
 import com.example.backend.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +34,11 @@ public class BoardController {
     }
 
     // ✅ 전체 목록 조회
-    @GetMapping("/list")
-    public List<BoardListDto> list() {
-        return boardService.list();
+    @GetMapping("list")
+    public List<BoardListDto> getAll(
+            @RequestParam(value = "q", defaultValue = "") String keyword) {
+
+        return boardService.list(keyword);
     }
 
 

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -12,26 +12,14 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 export function BoardDetail() {
   const [board, setBoard] = useState(null);
+  const [modalShow, setModalShow] = useState(false);
+  const { hasAccess, user } = useContext(AuthenticationContext); // user도 같이 받아오기
   const { id } = useParams();
   const navigate = useNavigate();
-  const [modalShow, setModalShow] = useState(false);
-
-  // 현재 로그인한 사용자 이메일 가져오기 (예시)
-  function getEmailFromToken() {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.sub || payload.email;
-    } catch {
-      return null;
-    }
-  }
-
-  const userEmail = getEmailFromToken();
 
   useEffect(() => {
     axios
@@ -44,14 +32,6 @@ export function BoardDetail() {
       });
   }, [id]);
 
-  if (!board) {
-    return <Spinner />;
-  }
-
-  function hasAccess(email) {
-    return userEmail === email;
-  }
-
   function handleDeleteButtonClick() {
     axios
       .delete(`/api/board/${id}`)
@@ -60,62 +40,69 @@ export function BoardDetail() {
         if (message) {
           toast(message.text, { type: message.type });
         }
-        navigate("/board/list");
+        navigate("/");
       })
       .catch(() => {
         toast("게시물이 삭제되지 않았습니다.", { type: "warning" });
       });
   }
 
+  if (!board) {
+    return <Spinner />;
+  }
+
   const formattedInsertedAt = board.insertedAt
-    ? new Date(board.insertedAt).toLocaleString()
+    ? board.insertedAt.substring(0, 16)
     : "";
 
+  // 디버깅용 로그
+  console.log("user email:", user?.email);
+  console.log("board author email:", board.authorEmail);
+  console.log("hasAccess result:", hasAccess(board.authorEmail));
+
   return (
-    <>
-      <Row className="justify-content-center">
-        <Col xs={12} md={8} lg={6}>
-          <h2 className="mb-4">{board.id}번 게시물</h2>
-          <FormGroup className="mb-3" controlId="title1">
-            <FormLabel>제목</FormLabel>
-            <FormControl readOnly value={board.title} />
-          </FormGroup>
-          <FormGroup className="mb-3" controlId="content1">
-            <FormLabel>본문</FormLabel>
-            <FormControl
-              as="textarea"
-              rows={6}
-              readOnly
-              value={board.content}
-            />
-          </FormGroup>
-          <FormGroup className="mb-3" controlId="author1">
-            <FormLabel>작성자</FormLabel>
-            <FormControl readOnly value={board.authorNickName} />
-          </FormGroup>
-          <FormGroup className="mb-3" controlId="insertedAt1">
-            <FormLabel>작성일시</FormLabel>
-            <FormControl type="text" readOnly value={formattedInsertedAt} />
-          </FormGroup>
-          {hasAccess(board.authorEmail) && (
-            <div>
-              <Button
-                onClick={() => setModalShow(true)}
-                className="me-2"
-                variant="outline-danger"
-              >
-                삭제
-              </Button>
-              <Button
-                variant="outline-info"
-                onClick={() => navigate(`/board/edit?id=${board.id}`)}
-              >
-                수정
-              </Button>
-            </div>
-          )}
-        </Col>
-      </Row>
+    <Row className="justify-content-center">
+      <Col xs={12} md={8} lg={6}>
+        <h2 className="mb-4">{board.id}번 게시물</h2>
+        <FormGroup className="mb-3" controlId="title1">
+          <FormLabel>제목</FormLabel>
+          <FormControl readOnly value={board.title} />
+        </FormGroup>
+        <FormGroup className="mb-3" controlId="content1">
+          <FormLabel>본문</FormLabel>
+          <FormControl as="textarea" rows={6} readOnly value={board.content} />
+        </FormGroup>
+        <FormGroup className="mb-3" controlId="author1">
+          <FormLabel>작성자</FormLabel>
+          <FormControl readOnly value={board.authorNickName} />
+        </FormGroup>
+        <FormGroup className="mb-3" controlId="insertedAt1">
+          <FormLabel>작성일시</FormLabel>
+          <FormControl
+            type="datetime-local"
+            readOnly
+            value={formattedInsertedAt}
+          />
+        </FormGroup>
+
+        {hasAccess(board.authorEmail) && (
+          <div>
+            <Button
+              onClick={() => setModalShow(true)}
+              className="me-2"
+              variant="outline-danger"
+            >
+              삭제
+            </Button>
+            <Button
+              variant="outline-info"
+              onClick={() => navigate(`/board/edit?id=${board.id}`)}
+            >
+              수정
+            </Button>
+          </div>
+        )}
+      </Col>
 
       <Modal show={modalShow} onHide={() => setModalShow(false)}>
         <Modal.Header closeButton>
@@ -131,6 +118,6 @@ export function BoardDetail() {
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </Row>
   );
 }

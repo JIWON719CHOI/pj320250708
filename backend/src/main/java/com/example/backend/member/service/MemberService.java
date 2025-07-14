@@ -121,18 +121,6 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public void changePassword(ChangePasswordForm form) {
-        Member member = memberRepository.findById(form.getEmail())
-                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
-
-        if (!bCryptPasswordEncoder.matches(form.getOldPassword(), member.getPassword())) {
-            throw new RuntimeException("이전 비밀번호가 일치하지 않습니다.");
-        }
-
-        member.setPassword(bCryptPasswordEncoder.encode(form.getNewPassword().trim()));
-        memberRepository.save(member);
-    }
-
     public String getToken(MemberLoginForm loginForm) {
         Member member = memberRepository.findById(loginForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다."));
@@ -141,14 +129,33 @@ public class MemberService {
             throw new RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
 
+        // 권한 목록 조회
+        List<String> authList = memberRepository.findAuthNamesByMemberEmail(member.getEmail());
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(60 * 60 * 24 * 365)) // 1년
+                .expiresAt(Instant.now().plusSeconds(60 * 60 * 24 * 365))
                 .subject(member.getEmail())
+                .claim("scp", String.join(" ", authList))  // 수정된 부분
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+
+    public void changePassword(ChangePasswordForm form) {
+        Member member = memberRepository.findById(form.getEmail())
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+
+        // 기존 비밀번호가 일치하는지 확인
+        if (!bCryptPasswordEncoder.matches(form.getOldPassword(), member.getPassword())) {
+            throw new RuntimeException("이전 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 새 비밀번호 암호화 후 저장
+        member.setPassword(bCryptPasswordEncoder.encode(form.getNewPassword().trim()));
+        memberRepository.save(member);
     }
 
 }

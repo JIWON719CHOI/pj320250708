@@ -2,7 +2,6 @@ package com.example.backend.board.service;
 
 import com.example.backend.board.dto.BoardDto;
 import com.example.backend.board.dto.BoardListDto;
-import com.example.backend.board.dto.BoardListInfo;
 import com.example.backend.board.entity.Board;
 import com.example.backend.board.repository.BoardRepository;
 import com.example.backend.member.entity.Member;
@@ -45,8 +44,9 @@ public class BoardService {
                 && dto.getContent() != null && !dto.getContent().trim().isBlank();
     }
 
-    public List<BoardListDto> list() {
-        return boardRepository.findAllBy();
+    public List<BoardListDto> list(String keyword) {
+        String queryKeyword = "%" + keyword.trim() + "%";  // 앞뒤에 % 붙이기
+        return boardRepository.findAllBy(queryKeyword);
     }
 
     public Optional<BoardDto> getBoardById(Integer id) {

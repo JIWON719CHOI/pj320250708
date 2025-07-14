@@ -14,7 +14,7 @@ export function MemberList() {
         setMemberList(res.data);
       })
       .catch((err) => {
-        console.log("bad");
+        console.log("bad", err);
       })
       .finally(() => {
         console.log("always");
