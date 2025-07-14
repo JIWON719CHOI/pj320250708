@@ -4,7 +4,10 @@ import com.example.backend.board.dto.BoardDto;
 import com.example.backend.board.dto.BoardListInfo;
 import com.example.backend.board.entity.Board;
 import com.example.backend.board.repository.BoardRepository;
+import com.example.backend.member.entity.Member;
+import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,59 +20,66 @@ import java.util.Optional;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final MemberRepository memberRepository;
 
-    public void add(BoardDto dto) {
-        // entity에 dto의 값..들을 옮겨 담고
+    public void add(BoardDto dto, Authentication authentication) {
+        String email = Optional.ofNullable(authentication)
+                .filter(Authentication::isAuthenticated)
+                .map(Authentication::getName)
+                .orElseThrow(() -> new RuntimeException("권한이 없습니다."));
+
+        Member member = memberRepository.findById(email)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+
         Board board = new Board();
-        board.setTitle(dto.getTitle());
-        board.setContent(dto.getContent());
-        board.setAuthor(dto.getAuthor());
-
-        // repository 에 save 실행
+        board.setTitle(dto.getTitle().trim());
+        board.setContent(dto.getContent().trim());
+        board.setAuthor(member);
         boardRepository.save(board);
     }
 
     public boolean validate(BoardDto dto) {
-        if (dto.getTitle() == null || dto.getTitle().trim().isBlank()) {
-            return false;
-        }
-        if (dto.getContent() == null || dto.getContent().trim().isBlank()) {
-            return false;
-        }
-        if (dto.getAuthor() == null || dto.getAuthor().trim().isBlank()) {
-            return false;
-        }
-        return true;
+        return dto.getTitle() != null && !dto.getTitle().trim().isBlank()
+                && dto.getContent() != null && !dto.getContent().trim().isBlank();
     }
 
     public List<BoardListInfo> list() {
         return boardRepository.findAllByOrderByIdDesc();
     }
 
-    public BoardDto getBoardById(Integer id) {
-        Board board = boardRepository.findById(id).get();
-        BoardDto boardDto = new BoardDto();
-        boardDto.setId(board.getId());
-        boardDto.setInsertedAt(board.getInsertedAt());
-        boardDto.setTitle(board.getTitle());
-        boardDto.setContent(board.getContent());
-        boardDto.setAuthor(board.getAuthor());
-
-        return boardDto;
+    public Optional<BoardDto> getBoardById(Integer id) {
+        return boardRepository.findById(id)
+                .map(b -> {
+                    BoardDto dto = new BoardDto();
+                    dto.setId(b.getId());
+                    dto.setTitle(b.getTitle());
+                    dto.setContent(b.getContent());
+                    dto.setAuthorEmail(b.getAuthor().getEmail());
+                    dto.setAuthorNickName(b.getAuthor().getNickName());
+                    dto.setInsertedAt(b.getInsertedAt());
+                    return dto;
+                });
     }
 
-    public void deleteById(Integer id) {
-        boardRepository.deleteById(id);
+    public void deleteById(Integer id, Authentication authentication) {
+        String email = authentication.getName();
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당 게시물이 없습니다."));
+        if (!board.getAuthor().getEmail().equals(email)) {
+            throw new RuntimeException("본인 게시물만 삭제할 수 있습니다.");
+        }
+        boardRepository.delete(board);
     }
 
-    public void update(BoardDto boardDto) {
-        // 조회
-        Board db = boardRepository.findById(boardDto.getId()).get();
-        // 변경
-        db.setTitle(boardDto.getTitle());
-        db.setContent(boardDto.getContent());
-        db.setAuthor(boardDto.getAuthor());
-        // 저장
-        boardRepository.save(db);
+    public void update(BoardDto dto, Authentication authentication) {
+        String email = authentication.getName();
+        Board board = boardRepository.findById(dto.getId())
+                .orElseThrow(() -> new RuntimeException("해당 게시물이 없습니다."));
+        if (!board.getAuthor().getEmail().equals(email)) {
+            throw new RuntimeException("본인 게시물만 수정할 수 있습니다.");
+        }
+        board.setTitle(dto.getTitle().trim());
+        board.setContent(dto.getContent().trim());
+        boardRepository.save(board);
     }
 }

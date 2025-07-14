@@ -73,9 +73,11 @@ export function BoardList() {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {board.author}
+                    {board.authorNickName}
                   </td>
-                  <td style={{ width: "125px" }}>{board.timesAgo}</td>
+                  <td style={{ width: "125px" }}>
+                    {new Date(board.insertedAt).toLocaleString()}
+                  </td>
                 </tr>
               ))}
             </tbody>

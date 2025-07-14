@@ -9,6 +9,7 @@ public class BoardDto {
     private Integer id;
     private String title;
     private String content;
-    private String author;
+    private String authorEmail;
+    private String authorNickName;
     private LocalDateTime insertedAt;
 }

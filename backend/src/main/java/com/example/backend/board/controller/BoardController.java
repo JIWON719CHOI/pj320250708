@@ -1,3 +1,4 @@
+// ✅ BoardController.java - 완성본
 package com.example.backend.board.controller;
 
 import com.example.backend.board.dto.BoardDto;
@@ -5,6 +6,8 @@ import com.example.backend.board.dto.BoardListInfo;
 import com.example.backend.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,58 +20,61 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @PostMapping("add")
-    @ResponseBody
-    public ResponseEntity<?> add(@RequestBody BoardDto dto) {
-        // 값들이 유효한지 확인
-        boolean result = boardService.validate(dto);
+    // ✅ 게시글 추가
+    @PostMapping("/add")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> add(@RequestBody BoardDto dto,
+                                 Authentication authentication) {
+        if (!boardService.validate(dto)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
+        }
+        boardService.add(dto, authentication);
+        return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", "새 글이 저장되었습니다.")));
+    }
 
-        if (result) {
-            // service 에게 넘겨서 일 시키기
-            boardService.add(dto);
-            return ResponseEntity.ok().body(Map.of(
-                    "message", Map.of("type", "success",
-                            "text", "새 글이 저장되었습니다.")));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", Map.of("type", "error",
-                            "text", "입력한 내용이 유효하지 않습니다.")));
+    // ✅ 전체 목록 조회
+    @GetMapping("/list")
+    public ResponseEntity<List<BoardListInfo>> list() {
+        try {
+            List<BoardListInfo> list = boardService.list();
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            // 로그 남기기
+            return ResponseEntity.status(500).build();
         }
     }
 
-    @GetMapping("list")
-    public List<BoardListInfo> getAllBoards() {
-        return boardService.list();
+
+    // ✅ 단건 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<BoardDto> getById(@PathVariable Integer id) {
+        return boardService.getBoardById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("{id}")
-    public BoardDto getBoardById(@PathVariable Integer id) {
-        return boardService.getBoardById(id);
+    // ✅ 삭제 (본인만 가능)
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> delete(@PathVariable Integer id,
+                                    Authentication authentication) {
+        boardService.deleteById(id, authentication);
+        return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", id + "번 게시물이 삭제되었습니다.")));
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteBoardById(@PathVariable Integer id) {
-        boardService.deleteById(id);
-        return ResponseEntity.ok().body(Map.of(
-                "message", Map.of("type", "success",
-                        "text", id + "번 게시물이 삭제되었습니다.")));
-    }
-
-    @PutMapping("{id}")
-    public ResponseEntity<?> updateBoardById(@PathVariable Integer id,
-                                             @RequestBody BoardDto boardDto) {
-
-        boolean result = boardService.validate(boardDto);
-        if (result) {
-
-            boardService.update(boardDto);
-            return ResponseEntity.ok().body(Map.of(
-                    "message", Map.of("type", "success",
-                            "text", id + "번 게시물이 수정되었습니다.")));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", Map.of("type", "error",
-                            "text", "입력한 내용이 유효하지 않습니다.")));
+    // ✅ 수정 (본인만 가능)
+    @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> update(@PathVariable Integer id,
+                                    @RequestBody BoardDto dto,
+                                    Authentication authentication) {
+        dto.setId(id);
+        if (!boardService.validate(dto)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
         }
+        boardService.update(dto, authentication);
+        return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", id + "번 게시물이 수정되었습니다.")));
     }
 }
