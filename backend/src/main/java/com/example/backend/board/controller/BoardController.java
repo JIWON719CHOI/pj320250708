@@ -43,8 +43,9 @@ public class BoardController {
     }
 
 
-    // ✅ 단건 조회
+    // ✅ 단건 조회 로그인한 사용자만 상세 글 조회 가능하게 설정
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<BoardDto> getById(@PathVariable Integer id) {
         return boardService.getBoardById(id)
                 .map(ResponseEntity::ok)

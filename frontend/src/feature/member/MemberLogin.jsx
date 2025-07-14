@@ -19,10 +19,7 @@ export function MemberLogin() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
-  // Context에서 로그인 함수 가져오기
   const { login } = useContext(AuthenticationContext);
-
   const navigate = useNavigate();
 
   async function handleLogInButtonClick() {
@@ -56,9 +53,8 @@ export function MemberLogin() {
         toast(res.data.message.text, { type: res.data.message.type });
       }
 
-      navigate("/"); // 로그인 성공 후 메인 페이지 이동
+      navigate("/");
     } catch (err) {
-      console.error("❌ 로그인 실패:", err);
       setErrorMsg("로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요.");
     } finally {
       setLoading(false);
@@ -98,7 +94,7 @@ export function MemberLogin() {
           />
         </FormGroup>
 
-        <div className="d-grid">
+        <div className="d-grid mb-3">
           <Button
             variant="primary"
             onClick={handleLogInButtonClick}
@@ -112,6 +108,13 @@ export function MemberLogin() {
             ) : (
               "로그인"
             )}
+          </Button>
+        </div>
+
+        {/* 회원가입 버튼 추가 */}
+        <div className="d-grid">
+          <Button variant="outline-primary" onClick={() => navigate("/signup")}>
+            회원가입
           </Button>
         </div>
       </Col>

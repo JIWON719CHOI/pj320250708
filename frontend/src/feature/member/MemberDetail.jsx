@@ -18,11 +18,8 @@ export function MemberDetail() {
   const [member, setMember] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [password, setPassword] = useState("");
-
   const { logout, hasAccess } = useContext(AuthenticationContext);
-
   const [params] = useSearchParams();
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,11 +30,8 @@ export function MemberDetail() {
       })
       .catch((err) => {
         console.log("bad", err);
-      })
-      .finally(() => {
-        console.log("always");
       });
-  }, []);
+  }, [params]);
 
   function handleDeleteButtonClick() {
     axios
@@ -45,22 +39,22 @@ export function MemberDetail() {
         data: { email: member.email, password: password },
       })
       .then((res) => {
-        console.log("good");
-        const message = res.data.message;
-        toast(message.text, { type: message.type });
+        toast(res.data.message.text, { type: res.data.message.type });
         navigate("/");
         logout();
       })
       .catch((err) => {
-        console.log("bad");
-        const message = err.response.data.message;
-        toast(message.text, { type: message.type });
+        toast(err.response.data.message.text, { type: "danger" });
       })
       .finally(() => {
-        console.log("always");
         setModalShow(false);
         setPassword("");
       });
+  }
+
+  function handleLogoutClick() {
+    logout();
+    navigate("/");
   }
 
   if (!member) {
@@ -71,34 +65,32 @@ export function MemberDetail() {
     <Row className="justify-content-center">
       <Col xs={12} md={8} lg={6}>
         <h2 className="mb-4">회원 정보</h2>
-        <div>
-          <FormGroup controlId="email1" className="mb-3">
-            <FormLabel>이메일</FormLabel>
-            <FormControl readOnly value={member.email} />
-          </FormGroup>
-        </div>
-        <div>
-          <FormGroup controlId="nickName1" className="mb-3">
-            <FormLabel>별명</FormLabel>
-            <FormControl readOnly value={member.nickName} />
-          </FormGroup>
-        </div>
-        <div>
-          <FormGroup controlId="info1" className="mb-3">
-            <FormLabel>자기소개</FormLabel>
-            <FormControl as="textarea" readOnly value={member.info} />
-          </FormGroup>
-        </div>
-        <div>
-          <FormGroup controlId="inserted1" className="mb-3">
-            <FormLabel>가입일시</FormLabel>
-            <FormControl
-              type="datetime-local"
-              readOnly
-              value={member.insertedAt}
-            />
-          </FormGroup>
-        </div>
+
+        {/* 회원 정보 폼들 */}
+        <FormGroup controlId="email1" className="mb-3">
+          <FormLabel>이메일</FormLabel>
+          <FormControl readOnly value={member.email} />
+        </FormGroup>
+
+        <FormGroup controlId="nickName1" className="mb-3">
+          <FormLabel>별명</FormLabel>
+          <FormControl readOnly value={member.nickName} />
+        </FormGroup>
+
+        <FormGroup controlId="info1" className="mb-3">
+          <FormLabel>자기소개</FormLabel>
+          <FormControl as="textarea" readOnly value={member.info} />
+        </FormGroup>
+
+        <FormGroup controlId="inserted1" className="mb-3">
+          <FormLabel>가입일시</FormLabel>
+          <FormControl
+            type="datetime-local"
+            readOnly
+            value={member.insertedAt}
+          />
+        </FormGroup>
+
         {hasAccess(member.email) && (
           <div>
             <Button
@@ -110,15 +102,21 @@ export function MemberDetail() {
             </Button>
             <Button
               variant="outline-info"
+              className="me-2"
               onClick={() => navigate(`/member/edit?email=${member.email}`)}
             >
               수정
+            </Button>
+
+            {/* 새로 추가하는 로그아웃 버튼 */}
+            <Button ariant="outline-secondary" onClick={handleLogoutClick}>
+              로그아웃
             </Button>
           </div>
         )}
       </Col>
 
-      {/*   삭제 확인 모달 */}
+      {/* 탈퇴 확인 모달 */}
       <Modal show={modalShow} onHide={() => setModalShow(false)}>
         <Modal.Header closeButton>
           <Modal.Title>회원 탈퇴 확인</Modal.Title>
@@ -130,7 +128,7 @@ export function MemberDetail() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            ></FormControl>
+            />
           </FormGroup>
         </Modal.Body>
         <Modal.Footer>

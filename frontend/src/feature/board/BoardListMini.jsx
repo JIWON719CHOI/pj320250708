@@ -47,13 +47,18 @@ export function BoardListMini() {
   const recentList = boardList.slice(0, 3);
 
   return (
-    <Table striped hover size="sm">
+    <Table
+      striped
+      hover
+      size="sm"
+      style={{ tableLayout: "fixed", width: "100%" }}
+    >
       <thead>
         <tr>
-          <th>#</th>
-          <th>제목</th>
-          <th>작성자</th>
-          <th>작성일시</th>
+          <th style={{ width: "60px" }}>#</th>
+          <th style={{ width: "75%" }}>제목</th>
+          <th style={{ width: "20%" }}>작성자</th>
+          <th style={{ width: "25%" }}>작성일시</th>
         </tr>
       </thead>
       <tbody>
@@ -66,7 +71,6 @@ export function BoardListMini() {
             <td style={{ width: "50px" }}>{board.id}</td>
             <td
               style={{
-                maxWidth: "150px",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -77,7 +81,6 @@ export function BoardListMini() {
             </td>
             <td
               style={{
-                maxWidth: "50px",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -86,7 +89,7 @@ export function BoardListMini() {
             >
               {board.author}
             </td>
-            <td style={{ width: "110px" }}>{board.timesAgo}</td>
+            <td style={{ whiteSpace: "nowrap" }}>{board.timesAgo}</td>
           </tr>
         ))}
       </tbody>

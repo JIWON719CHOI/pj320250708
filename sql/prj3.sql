@@ -27,6 +27,18 @@ CREATE TABLE auth
     FOREIGN KEY (member_email) REFERENCES member (email)
 );
 
+CREATE TABLE comment
+(
+    id          INT AUTO_INCREMENT NOT NULL,
+    board_id    INT                NOT NULL,
+    author      VARCHAR(255)       NOT NULL,
+    comment     VARCHAR(2000)      NOT NULL,
+    inserted_at datetime           NOT NULL DEFAULT NOW(),
+    CONSTRAINT pk_comment PRIMARY KEY (id),
+    FOREIGN KEY (author) REFERENCES member (email),
+    FOREIGN KEY (board_id) REFERENCES board (id)
+);
+
 INSERT INTO member (email, nick_name, password, inserted_at)
 VALUES ('admin@email.com', 'admin', '1234', NOW());
 
