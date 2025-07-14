@@ -8,47 +8,47 @@ export function AppNavBar() {
 
   return (
     <Navbar expand="lg" bg="light" fixed="top" className="bg-body-tertiary">
-      <Container>
+      <Container className="d-flex align-items-center">
+        {/* 1. 브랜드 (왼쪽 끝) */}
         <Navbar.Brand as={Link} to="/" className="fs-3 fw-bold">
           PRJ3
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="navbar-nav" />
-        <Navbar.Collapse id="navbar-nav">
-          <Nav className="me-auto">
+        {/* 2. 메뉴 (Collapse 안) */}
+        <Navbar.Collapse id="main-nav">
+          <Nav>
             <Nav.Link as={NavLink} to="/board/list">
               게시판 목록
             </Nav.Link>
-
             {user && (
               <Nav.Link as={NavLink} to="/board/add">
                 게시글 작성
               </Nav.Link>
             )}
-
             {isAdmin() && (
               <Nav.Link as={NavLink} to="/member/list">
                 회원 목록
               </Nav.Link>
             )}
           </Nav>
+        </Navbar.Collapse>
 
-          <Nav>
-            {/* 로그인 안 된 경우 로그인 링크 항상 노출 */}
-            {!user && (
+        {/* 3. 로그인/닉네임 + 햄버거 토글 묶음 (오른쪽 끝에 고정) */}
+        <div className="d-flex align-items-center ms-auto">
+          <Nav className="me-3">
+            {!user ? (
               <Nav.Link as={NavLink} to="/login">
                 로그인
               </Nav.Link>
-            )}
-
-            {/* 로그인 된 경우 닉네임만 노출, 클릭 시 멤버 디테일 페이지로 이동 */}
-            {user && (
+            ) : (
               <Nav.Link as={NavLink} to={`/member?email=${user.email}`}>
                 {user.nickName}
               </Nav.Link>
             )}
           </Nav>
-        </Navbar.Collapse>
+
+          <Navbar.Toggle aria-controls="main-nav" />
+        </div>
       </Container>
     </Navbar>
   );
