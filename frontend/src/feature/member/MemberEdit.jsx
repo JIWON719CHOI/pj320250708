@@ -49,7 +49,7 @@ export function MemberEdit() {
   const isPasswordMatch = newPassword1 === newPassword2;
 
   // 버튼 비활성화
-  const isSaveDisabled = !password || !isNickNameValid;
+  const isSaveDisabled = !isNickNameValid;
   const isChangePasswordDisabled =
     !oldPassword ||
     !newPassword1 ||
@@ -69,7 +69,6 @@ export function MemberEdit() {
       .then((res) => {
         const message = res.data.message;
         if (message) toast(message.text, { type: message.type });
-        logout(); // 토큰 갱신이나 보안 처리 시 필요
         navigate("/");
       })
       .catch((err) => {

@@ -17,18 +17,18 @@ export function AppNavBar() {
         <Navbar.Collapse id="navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={NavLink} to="/board/list">
-              게시판
+              게시판 목록
             </Nav.Link>
 
             {user && (
               <Nav.Link as={NavLink} to="/board/add">
-                작성
+                게시글 작성
               </Nav.Link>
             )}
 
             {isAdmin() && (
               <Nav.Link as={NavLink} to="/member/list">
-                목록
+                회원 목록
               </Nav.Link>
             )}
           </Nav>
