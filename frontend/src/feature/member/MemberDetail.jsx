@@ -9,10 +9,11 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-toastify";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 export function MemberDetail() {
   const [member, setMember] = useState(null);
@@ -21,6 +22,8 @@ export function MemberDetail() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
+  const { logout } = useContext(AuthenticationContext);
+
   useEffect(() => {
     axios
       .get(`/api/member?email=${params.get("email")}`)
@@ -28,7 +31,7 @@ export function MemberDetail() {
         setMember(res.data);
       })
       .catch((err) => {
-        console.log("bad");
+        console.log("bad", err);
       })
       .finally(() => {
         console.log("always");
@@ -44,7 +47,9 @@ export function MemberDetail() {
         console.log("good");
         const message = res.data.message;
         toast(message.text, { type: message.type });
-        navigate("/");
+
+        logout(); // 🔐 로그아웃 처리 추가
+        navigate("/"); // 홈으로 이동
       })
       .catch((err) => {
         console.log("bad");

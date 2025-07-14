@@ -1,3 +1,5 @@
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Button,
   Col,
@@ -9,49 +11,44 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
-import { useNavigate, useSearchParams } from "react-router";
-import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 export function MemberEdit() {
-  // 🔸 상태 정의
+  // 상태 정의
   const [member, setMember] = useState(null);
-  const [modalShow, setModalShow] = useState(false); // 정보 수정 확인 모달
-  const [passwordModalShow, setPasswordModalShow] = useState(false); // 비밀번호 변경 모달
-  const [password, setPassword] = useState(""); // 정보 수정용 현재 비밀번호
-  const [oldPassword, setOldPassword] = useState(""); // 변경 전 비밀번호
-  const [newPassword1, setNewPassword1] = useState(""); // 새 비밀번호
-  const [newPassword2, setNewPassword2] = useState(""); // 새 비밀번호 확인
+  const [modalShow, setModalShow] = useState(false);
+  const [passwordModalShow, setPasswordModalShow] = useState(false);
+  const [password, setPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword1, setNewPassword1] = useState("");
+  const [newPassword2, setNewPassword2] = useState("");
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { logout } = useContext(AuthenticationContext);
 
-  // 🔸 정규식
+  // 정규식
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=-]).{8,}$/;
   const nickRegex = /^[가-힣a-zA-Z0-9]{2,20}$/;
 
-  // 🔸 최초 한 번 회원 정보 가져오기
+  // 최초 회원 정보 로딩
   useEffect(() => {
     axios
       .get(`/api/member?email=${params.get("email")}`)
-      .then((res) => {
-        setMember(res.data);
-      })
-      .catch((err) => {
-        console.log("회원 정보 불러오기 실패", err);
-      });
+      .then((res) => setMember(res.data))
+      .catch((err) => console.error("회원 정보 로딩 실패", err));
   }, []);
 
-  // 🔸 로딩 스피너
   if (!member) return <Spinner />;
 
-  // 🔸 유효성 검사 결과
+  // 유효성
   const isNickNameValid = nickRegex.test(member.nickName);
   const isPasswordValid = passwordRegex.test(newPassword1);
   const isPasswordMatch = newPassword1 === newPassword2;
 
-  // 🔸 버튼 비활성화 조건
+  // 버튼 비활성화
   const isSaveDisabled = !password || !isNickNameValid;
   const isChangePasswordDisabled =
     !oldPassword ||
@@ -60,14 +57,20 @@ export function MemberEdit() {
     !isPasswordValid ||
     !isPasswordMatch;
 
-  // 🔸 회원 정보 저장 요청
+  // 정보 수정 요청
   const handleSaveButtonClick = () => {
     axios
-      .put(`/api/member`, { ...member, password })
+      .put(`/api/member`, {
+        email: member.email,
+        nickName: member.nickName,
+        info: member.info,
+        password,
+      })
       .then((res) => {
         const message = res.data.message;
         if (message) toast(message.text, { type: message.type });
-        navigate(`/member?email=${member.email}`);
+        logout(); // 토큰 갱신이나 보안 처리 시 필요
+        navigate("/");
       })
       .catch((err) => {
         const message = err.response?.data?.message;
@@ -79,13 +82,13 @@ export function MemberEdit() {
       });
   };
 
-  // 🔸 비밀번호 변경 요청
+  // 비밀번호 변경 요청
   const handleChangePasswordButtonClick = () => {
     axios
       .put(`/api/member/changePassword`, {
         email: member.email,
         oldPassword,
-        newPassword1,
+        newPassword: newPassword1,
       })
       .then((res) => {
         const message = res.data.message;
@@ -106,13 +109,11 @@ export function MemberEdit() {
       <Col xs={12} md={8} lg={6}>
         <h2 className="mb-4">회원 정보 수정</h2>
 
-        {/* 🔹 이메일 - 수정 불가 */}
         <FormGroup controlId="email1" className="mb-3">
           <FormLabel>이메일</FormLabel>
           <FormControl disabled value={member.email} />
         </FormGroup>
 
-        {/* 🔹 비밀번호 변경 버튼 */}
         <div className="mb-4">
           <Button
             variant="outline-info"
@@ -122,7 +123,6 @@ export function MemberEdit() {
           </Button>
         </div>
 
-        {/* 🔹 별명 입력 */}
         <FormGroup controlId="nickName1" className="mb-3">
           <FormLabel>별명</FormLabel>
           <FormControl
@@ -143,7 +143,6 @@ export function MemberEdit() {
           )}
         </FormGroup>
 
-        {/* 🔹 자기소개 */}
         <FormGroup controlId="info1" className="mb-3">
           <FormLabel>자기소개</FormLabel>
           <FormControl
@@ -154,7 +153,6 @@ export function MemberEdit() {
           />
         </FormGroup>
 
-        {/* 🔹 가입일시 - 읽기 전용 */}
         <FormGroup controlId="insertedAt1" className="mb-3">
           <FormLabel>가입일시</FormLabel>
           <FormControl
@@ -164,7 +162,6 @@ export function MemberEdit() {
           />
         </FormGroup>
 
-        {/* 🔹 버튼 영역 */}
         <div>
           <Button
             className="me-2"
@@ -175,7 +172,7 @@ export function MemberEdit() {
           </Button>
           <Button
             variant="primary"
-            disabled={!isNickNameValid}
+            disabled={isSaveDisabled}
             onClick={() => setModalShow(true)}
           >
             저장
@@ -183,7 +180,6 @@ export function MemberEdit() {
         </div>
       </Col>
 
-      {/* 🔸 회원 정보 수정 시 암호 입력 모달 */}
       <Modal show={modalShow} onHide={() => setModalShow(false)}>
         <Modal.Header closeButton>
           <Modal.Title>회원 정보 수정 확인</Modal.Title>
@@ -209,7 +205,6 @@ export function MemberEdit() {
         </Modal.Footer>
       </Modal>
 
-      {/* 🔸 비밀번호 변경 모달 */}
       <Modal
         show={passwordModalShow}
         onHide={() => setPasswordModalShow(false)}
@@ -218,7 +213,6 @@ export function MemberEdit() {
           <Modal.Title>비밀번호 변경</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {/* 현재 비밀번호 */}
           <FormGroup className="mb-3" controlId="password2">
             <FormLabel>현재 비밀번호</FormLabel>
             <FormControl
@@ -228,7 +222,6 @@ export function MemberEdit() {
             />
           </FormGroup>
 
-          {/* 새 비밀번호 */}
           <FormGroup className="mb-3" controlId="password3">
             <FormLabel>변경할 비밀번호</FormLabel>
             <FormControl
@@ -246,7 +239,6 @@ export function MemberEdit() {
             )}
           </FormGroup>
 
-          {/* 새 비밀번호 확인 */}
           <FormGroup className="mb-3" controlId="password4">
             <FormLabel>변경할 비밀번호 확인</FormLabel>
             <FormControl

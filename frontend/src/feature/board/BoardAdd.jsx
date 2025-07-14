@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -11,19 +11,21 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 export function BoardAdd() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [author, setAuthor] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const { user } = useContext(AuthenticationContext);
 
   const navigate = useNavigate();
 
   function handleSaveButtonClick() {
     setIsProcessing(true);
     axios
-      .post("/api/board/add", { title, content, author })
+      .post("/api/board/add", { title, content })
       .then((res) => {
         const message = res.data.message;
         // toast 띄우기
@@ -51,8 +53,6 @@ export function BoardAdd() {
   if (title.trim() === "") {
     validate = false;
   } else if (content.trim() === "") {
-    validate = false;
-  } else if (author.trim() === "") {
     validate = false;
   }
 
@@ -83,10 +83,7 @@ export function BoardAdd() {
         <div>
           <FormGroup className="mb-3" controlId="author1">
             <FormLabel>작성자</FormLabel>
-            <FormControl
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-            />
+            <FormControl value={user.nickName} disabled />
           </FormGroup>
         </div>
         <div className="mb-3">

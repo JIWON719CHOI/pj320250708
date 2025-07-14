@@ -4,6 +4,7 @@ import com.example.backend.member.dto.*;
 import com.example.backend.member.entity.Member;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -22,13 +23,14 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtEncoder jwtEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void add(MemberForm memberForm) {
-        validate(memberForm);
+        this.validate(memberForm);
 
         Member member = new Member();
         member.setEmail(memberForm.getEmail().trim());
-        member.setPassword(memberForm.getPassword().trim());
+        member.setPassword(bCryptPasswordEncoder.encode(memberForm.getPassword().trim()));
         member.setInfo(memberForm.getInfo());
         member.setNickName(memberForm.getNickName().trim());
 
@@ -40,36 +42,40 @@ public class MemberService {
         String password = memberForm.getPassword().trim();
         String nickName = memberForm.getNickName().trim();
 
-        // 이메일 검증
         if (email.isBlank()) {
             throw new RuntimeException("이메일을 입력해야 합니다.");
         }
+
         String emailRegex = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$";
         if (!Pattern.matches(emailRegex, email)) {
             throw new RuntimeException("이메일 형식에 맞지 않습니다.");
         }
-        if (memberRepository.findById(email).isPresent()) {
+
+        Optional<Member> optionalMemberByEmail = memberRepository.findById(email);
+        if (optionalMemberByEmail.isPresent()) {
             throw new RuntimeException("이미 가입된 이메일입니다.");
         }
 
-        // 비밀번호 검증
         if (password.isBlank()) {
             throw new RuntimeException("비밀번호를 입력해야 합니다.");
         }
+
         String pwRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,}$";
         if (!Pattern.matches(pwRegex, password)) {
             throw new RuntimeException("비밀번호는 8자 이상이며, 영문 대소문자, 숫자, 특수문자를 포함해야 합니다.");
         }
 
-        // 닉네임 검증
         if (nickName.isBlank()) {
             throw new RuntimeException("닉네임을 입력해야 합니다.");
         }
+
         String nickRegex = "^[가-힣a-zA-Z0-9]{2,20}$";
         if (!Pattern.matches(nickRegex, nickName)) {
             throw new RuntimeException("닉네임은 2~20자이며, 한글, 영문, 숫자만 사용할 수 있습니다.");
         }
-        if (memberRepository.findByNickName(nickName).isPresent()) {
+
+        Optional<Member> optionalMemberByNick = memberRepository.findByNickName(nickName);
+        if (optionalMemberByNick.isPresent()) {
             throw new RuntimeException("이미 사용 중인 닉네임입니다.");
         }
     }
@@ -94,7 +100,7 @@ public class MemberService {
         Member member = memberRepository.findById(memberForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        if (!member.getPassword().equals(memberForm.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
             throw new RuntimeException("암호가 일치하지 않습니다.");
         }
 
@@ -105,7 +111,7 @@ public class MemberService {
         Member member = memberRepository.findById(memberForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        if (!member.getPassword().equals(memberForm.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
             throw new RuntimeException("암호가 일치하지 않습니다.");
         }
 
@@ -119,11 +125,11 @@ public class MemberService {
         Member member = memberRepository.findById(form.getEmail())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        if (!member.getPassword().equals(form.getOldPassword())) {
+        if (!bCryptPasswordEncoder.matches(form.getOldPassword(), member.getPassword())) {
             throw new RuntimeException("이전 비밀번호가 일치하지 않습니다.");
         }
 
-        member.setPassword(form.getNewPassword().trim());
+        member.setPassword(bCryptPasswordEncoder.encode(form.getNewPassword().trim()));
         memberRepository.save(member);
     }
 
@@ -131,7 +137,7 @@ public class MemberService {
         Member member = memberRepository.findById(loginForm.getEmail())
                 .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다."));
 
-        if (!member.getPassword().equals(loginForm.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(loginForm.getPassword(), member.getPassword())) {
             throw new RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
 
@@ -144,4 +150,6 @@ public class MemberService {
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
+
 }
+
