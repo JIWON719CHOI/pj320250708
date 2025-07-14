@@ -4,29 +4,47 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 
 export function BoardListMini() {
-  const [boardList, setBoardList] = useState(null);
+  // boardList는 항상 배열로 초기화
+  const [boardList, setBoardList] = useState([]);
+  const [loading, setLoading] = useState(true); // 로딩 상태
+  const [error, setError] = useState(null); // 에러 상태
   const navigate = useNavigate();
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     axios
       .get("/api/board/list")
       .then((res) => {
-        setBoardList(res.data);
+        // 서버 응답에서 boardList 키가 배열인지 확인하고 저장
+        const list = Array.isArray(res.data.boardList)
+          ? res.data.boardList
+          : [];
+        setBoardList(list);
       })
       .catch((err) => {
         console.error(err);
+        setError("게시글을 불러오는 중 오류가 발생했습니다.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
-  if (!boardList) {
+  if (loading) {
     return <p>불러오는 중...</p>;
   }
 
-  const recentList = boardList.slice(0, 3); // 앞의 3개만 가져옴
+  if (error) {
+    return <p style={{ color: "red" }}>{error}</p>;
+  }
 
-  if (recentList.length === 0) {
+  if (boardList.length === 0) {
     return <p>작성된 글이 없습니다.</p>;
   }
+
+  // 최신 3개만 보여줌
+  const recentList = boardList.slice(0, 3);
 
   return (
     <Table striped hover size="sm">
@@ -53,6 +71,7 @@ export function BoardListMini() {
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
+              title={board.title}
             >
               {board.title}
             </td>
@@ -63,6 +82,7 @@ export function BoardListMini() {
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
+              title={board.author}
             >
               {board.author}
             </td>

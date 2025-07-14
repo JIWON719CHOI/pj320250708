@@ -35,10 +35,11 @@ public class BoardController {
 
     // ✅ 전체 목록 조회
     @GetMapping("list")
-    public List<BoardListDto> getAll(
-            @RequestParam(value = "q", defaultValue = "") String keyword) {
+    public Map<String, Object> getAll(
+            @RequestParam(value = "q", defaultValue = "") String keyword,
+            @RequestParam(value = "p", defaultValue = "1") Integer pageNumber) {
 
-        return boardService.list(keyword);
+        return boardService.list(keyword, pageNumber);
     }
 
 
