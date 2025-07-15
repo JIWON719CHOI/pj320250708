@@ -31,7 +31,7 @@ function CommentAdd({ boardId, onCommentSaved }) {
       })
       .finally(() => {
         setIsProcessing(false);
-      });
+      }, []);
   }
 
   const saveButtonDisabled = comment.trim().length === 0;

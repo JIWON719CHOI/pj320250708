@@ -51,4 +51,8 @@ public class CommentController {
         return ResponseEntity.ok(Map.of("comments", commentDtos));
     }
 
+    // 수정
+
+    // 삭제
+
 }

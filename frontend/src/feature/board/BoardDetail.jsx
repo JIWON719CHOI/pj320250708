@@ -52,7 +52,7 @@ export function BoardDetail() {
       })
       .catch(() => {
         toast.warning("게시물이 삭제되지 않았습니다.");
-      });
+      }, []);
   }
 
   if (!board) {
