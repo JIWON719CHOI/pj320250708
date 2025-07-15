@@ -1,5 +1,7 @@
 package com.example.backend.member.service;
 
+import com.example.backend.board.repository.BoardRepository;
+import com.example.backend.comment.repository.CommentRepository;
 import com.example.backend.member.dto.*;
 import com.example.backend.member.entity.Member;
 import com.example.backend.member.repository.MemberRepository;
@@ -24,6 +26,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtEncoder jwtEncoder;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final CommentRepository commentRepository;
+    private final BoardRepository boardRepository;
 
     public void add(MemberForm memberForm) {
         this.validate(memberForm);
@@ -103,7 +107,9 @@ public class MemberService {
         if (!bCryptPasswordEncoder.matches(memberForm.getPassword(), member.getPassword())) {
             throw new RuntimeException("암호가 일치하지 않습니다.");
         }
-
+        // 댓글 → 게시글 → 회원 순으로 삭제해야 FK 위반 방지
+        commentRepository.deleteByAuthor(member);
+        boardRepository.deleteByAuthor(member);
         memberRepository.delete(member);
     }
 
