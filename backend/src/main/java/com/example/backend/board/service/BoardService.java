@@ -49,7 +49,6 @@ public class BoardService {
     }
 
     public Map<String, Object> list(String keyword, Integer pageNumber) {
-//        return boardRepository.findAllByOrderByIdDesc();
         Page<BoardListDto> boardListDtoPage
                 = boardRepository.findAllBy(keyword, PageRequest.of(pageNumber - 1, 10));
 

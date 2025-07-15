@@ -13,19 +13,32 @@ import {
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
-import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx"; // 경로는 상황에 맞게
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
-  const [pageInfo, setPageInfo] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [pageInfo, setPageInfo] = useState(null);
+  const keyword = searchParams.get("q") ?? "";
   const navigate = useNavigate();
   const { user } = useContext(AuthenticationContext);
 
-  // query 상태는 URL 에서 직접 추출
-  const keyword = searchParams.get("q") ?? "";
-  const page = searchParams.get("p") ?? "1";
+  const [keywords, setKeywords] = useState("");
+
+  function handleSearchFormSubmit(e) {
+    e.preventDefault();
+    navigate("/board/list?q=" + encodeURIComponent(keywords));
+  }
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) {
+      setKeywords(q);
+    } else {
+      setKeywords("");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user) {
@@ -33,6 +46,8 @@ export function BoardList() {
       setBoardList(null);
       return;
     }
+
+    const page = searchParams.get("p") ?? "1";
 
     axios
       .get("/api/board/list", { params: { q: keyword, p: page } })
@@ -49,21 +64,7 @@ export function BoardList() {
           setErrorMsg("게시글을 불러오는 중 오류가 발생했습니다.");
         }
       });
-  }, [user, keyword, page]);
-
-  function handleSearchFormSubmit(e) {
-    e.preventDefault();
-    const form = e.target;
-    const input = form.querySelector("input");
-    const newKeyword = input.value.trim();
-    setSearchParams({ q: newKeyword, p: 1 }); // 검색하면 항상 1페이지로
-  }
-
-  function handlePageNumberClick(pageNumber) {
-    const next = new URLSearchParams(searchParams);
-    next.set("p", pageNumber);
-    setSearchParams(next);
-  }
+  }, [searchParams]);
 
   function handleTableRowClick(id) {
     navigate(`/board/${id}`);
@@ -96,12 +97,17 @@ export function BoardList() {
     pageNumbers.push(i);
   }
 
+  function handlePageNumberClick(pageNumber) {
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.set("p", pageNumber);
+    setSearchParams(nextSearchParams);
+  }
+
   return (
     <>
       <Row>
         <Col>
           <h2 className="mb-4">글 목록</h2>
-
           {boardList.length > 0 ? (
             <Table
               striped
@@ -132,7 +138,15 @@ export function BoardList() {
                       }}
                       title={board.title}
                     >
-                      {board.title}
+                      {board.title}{" "}
+                      {board.countComment > 0 && (
+                        <span
+                          className="badge bg-secondary ms-2"
+                          style={{ fontSize: "0.75em" }}
+                        >
+                          {board.countComment}
+                        </span>
+                      )}
                     </td>
                     <td
                       style={{
@@ -140,9 +154,9 @@ export function BoardList() {
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                       }}
-                      title={board.author}
+                      title={board.nickName}
                     >
-                      {board.author}
+                      {board.nickName}
                     </td>
                     <td>{board.timesAgo}</td>
                   </tr>
@@ -156,20 +170,19 @@ export function BoardList() {
           )}
         </Col>
       </Row>
-
       <Row className="my-3">
         <Col>
           <Pagination className="justify-content-center">
             <Pagination.First
               disabled={pageInfo.currentPageNumber === 1}
               onClick={() => handlePageNumberClick(1)}
-            />
+            ></Pagination.First>
             <Pagination.Prev
               disabled={pageInfo.leftPageNumber <= 1}
               onClick={() =>
                 handlePageNumberClick(pageInfo.leftPageNumber - 10)
               }
-            />
+            ></Pagination.Prev>
             {pageNumbers.map((pageNumber) => (
               <Pagination.Item
                 key={pageNumber}
@@ -184,23 +197,22 @@ export function BoardList() {
               onClick={() =>
                 handlePageNumberClick(pageInfo.rightPageNumber + 1)
               }
-            />
+            ></Pagination.Next>
             <Pagination.Last
               disabled={pageInfo.currentPageNumber === pageInfo.totalPages}
               onClick={() => handlePageNumberClick(pageInfo.totalPages)}
-            />
+            ></Pagination.Last>
           </Pagination>
-
           <Form
             onSubmit={handleSearchFormSubmit}
-            className="mx-auto"
-            style={{ maxWidth: "500px" }}
+            className="order-lg-2 mx-lg-auto justify-content-center"
+            style={{ maxWidth: "500px" }} // 폼 전체 너비 제한
           >
-            <InputGroup>
+            <InputGroup style={{ width: "100%" }}>
               <FormControl
-                name="q"
+                value={keywords}
+                onChange={(e) => setKeywords(e.target.value)}
                 placeholder="(제목+내용)"
-                defaultValue={keyword}
               />
               <Button type="submit">검색</Button>
             </InputGroup>

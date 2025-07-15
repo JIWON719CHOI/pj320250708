@@ -52,13 +52,14 @@ export function CommentContainer({ boardId }) {
 
   return (
     <div>
-      <h3>댓글 창</h3>
+      <h3>댓글 창 ({commentList.length})</h3>
       <CommentList
         comments={commentList}
         onDelete={handleDelete}
         onUpdate={handleUpdate}
         currentUserEmail={currentUserEmail}
       />
+      <br />
       <CommentAdd boardId={boardId} onCommentSaved={fetchComments} />
     </div>
   );

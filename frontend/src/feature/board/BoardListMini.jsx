@@ -81,7 +81,15 @@ export function BoardListMini() {
               }}
               title={board.title}
             >
-              {board.title}
+              {board.title}{" "}
+              {board.countComment > 0 && (
+                <span
+                  className="badge bg-secondary ms-2"
+                  style={{ fontSize: "0.75em" }}
+                >
+                  {board.countComment}
+                </span>
+              )}
             </td>
             <td
               style={{
@@ -89,9 +97,9 @@ export function BoardListMini() {
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
-              title={board.author}
+              title={board.nickName}
             >
-              {board.author}
+              {board.nickName}
             </td>
             <td style={{ whiteSpace: "nowrap" }}>{board.timesAgo}</td>
           </tr>

@@ -109,7 +109,7 @@ export function BoardDetail() {
             </Button>
           </div>
         )}
-        <br />
+        <hr className="my-5" />
         {/* 댓글 목록 + 입력 컴포넌트 */}
         <CommentContainer boardId={board.id} />
       </Col>

@@ -1,19 +1,22 @@
 package com.example.backend.board.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+@Data
 @AllArgsConstructor
-@Getter
+@NoArgsConstructor
 public class BoardListDto {
     private Integer id;
     private String title;
-    private String author;
+    private String nickName;
     private LocalDateTime insertedAt;
+    private Long countComment;
 
     public String getTimesAgo() {
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
