@@ -1,26 +1,25 @@
-import { Table } from "react-bootstrap";
+import { Table, Spinner, Alert } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 
 export function BoardListMini() {
-  // boardList는 항상 배열로 초기화
   const [boardList, setBoardList] = useState([]);
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [error, setError] = useState(null); // 에러 상태
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
     setError(null);
+
     axios
       .get("/api/board/list")
       .then((res) => {
-        // 서버 응답에서 boardList 키가 배열인지 확인하고 저장
         const list = Array.isArray(res.data.boardList)
           ? res.data.boardList
           : [];
-        setBoardList(list);
+        setBoardList(list.slice(0, 3)); // 여기서 미리 3개 자름
       })
       .catch((err) => {
         console.error(err);
@@ -32,19 +31,24 @@ export function BoardListMini() {
   }, []);
 
   if (loading) {
-    return <p>불러오는 중...</p>;
+    return (
+      <div className="text-center my-3">
+        <Spinner animation="border" size="sm" /> 불러오는 중...
+      </div>
+    );
   }
 
   if (error) {
-    return <p style={{ color: "red" }}>{error}</p>;
+    return (
+      <Alert variant="danger" className="my-3">
+        {error}
+      </Alert>
+    );
   }
 
   if (boardList.length === 0) {
-    return <p>작성된 글이 없습니다.</p>;
+    return <p className="text-muted mt-2">작성된 글이 없습니다.</p>;
   }
-
-  // 최신 3개만 보여줌
-  const recentList = boardList.slice(0, 3);
 
   return (
     <Table
@@ -56,19 +60,19 @@ export function BoardListMini() {
       <thead>
         <tr>
           <th style={{ width: "60px" }}>#</th>
-          <th style={{ width: "75%" }}>제목</th>
+          <th style={{ width: "50%" }}>제목</th>
           <th style={{ width: "20%" }}>작성자</th>
-          <th style={{ width: "25%" }}>작성일시</th>
+          <th style={{ width: "30%" }}>작성일시</th>
         </tr>
       </thead>
       <tbody>
-        {recentList.map((board) => (
+        {boardList.map((board) => (
           <tr
             key={board.id}
             style={{ cursor: "pointer" }}
             onClick={() => navigate(`/board/${board.id}`)}
           >
-            <td style={{ width: "50px" }}>{board.id}</td>
+            <td>{board.id}</td>
             <td
               style={{
                 whiteSpace: "nowrap",
