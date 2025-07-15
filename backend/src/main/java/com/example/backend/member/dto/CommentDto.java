@@ -5,6 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+
 import java.time.format.DateTimeFormatter;
 
 @Data
@@ -14,20 +18,24 @@ public class CommentDto {
     private Integer id;
     private String comment;
     private String authorNickName;
+    private String authorEmail;  // 추가
     private String insertedAt;
 
-    // Comment 엔티티 → DTO 변환 생성자 추가
+    // Comment 엔티티 → DTO 변환 생성자 수정
     public CommentDto(Comment comment) {
         this.id = comment.getId();
         this.comment = comment.getComment();
         this.authorNickName = comment.getAuthor().getNickName();
 
+        // authorEmail 추가
+        this.authorEmail = comment.getAuthor().getEmail();
+
         if (comment.getInsertedAt() != null) {
-            // 예: 2025-07-14 15:30 형식으로 변환
-            this.insertedAt = comment.getInsertedAt()
-                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        } else {
-            this.insertedAt = "";
+            ZonedDateTime seoulTime = comment.getInsertedAt()
+                    .atZone(ZoneId.systemDefault()) // 또는 UTC
+                    .withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+            this.insertedAt = seoulTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
     }
 }
+

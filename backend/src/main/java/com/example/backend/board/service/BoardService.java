@@ -4,6 +4,7 @@ import com.example.backend.board.dto.BoardDto;
 import com.example.backend.board.dto.BoardListDto;
 import com.example.backend.board.entity.Board;
 import com.example.backend.board.repository.BoardRepository;
+import com.example.backend.comment.repository.CommentRepository;
 import com.example.backend.member.entity.Member;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,6 +25,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final CommentRepository commentRepository;
 
     public void add(BoardDto dto, Authentication authentication) {
         String email = Optional.ofNullable(authentication)
@@ -88,6 +89,7 @@ public class BoardService {
         if (!board.getAuthor().getEmail().equals(email)) {
             throw new RuntimeException("본인 게시물만 삭제할 수 있습니다.");
         }
+        commentRepository.deleteByBoardId(id);
         boardRepository.delete(board);
     }
 

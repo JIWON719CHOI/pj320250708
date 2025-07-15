@@ -20,10 +20,11 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    // 추가
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> addComment(@RequestBody CommentForm comment,
-                                        Authentication authentication) {
+    public ResponseEntity<?> add(@RequestBody CommentForm comment,
+                                 Authentication authentication) {
         try {
             commentService.add(comment, authentication);
             return ResponseEntity.ok()
@@ -39,20 +40,45 @@ public class CommentController {
 
     }
 
-    // 댓글 목록 조회 GET 메서드 추가
+    // 목록
     @GetMapping("/list")
-    public ResponseEntity<?> listComments(@RequestParam Integer boardId) {
+    public ResponseEntity<?> list(@RequestParam Integer boardId) {
         List<Comment> comments = commentService.findByBoardId(boardId);
 
         List<CommentDto> commentDtos = comments.stream()
-                .map(CommentDto::new)  // Comment → CommentDto 변환
+                .map(CommentDto::new)  // Comment → CommentDto 변환 (authorEmail 포함)
                 .toList();
 
         return ResponseEntity.ok(Map.of("comments", commentDtos));
     }
 
+
     // 수정
+    @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> update(@PathVariable Integer id,
+                                    @RequestBody CommentDto dto,
+                                    Authentication authentication) {
+        dto.setId(id);
+        if (!commentService.validate(dto)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
+        }
+        commentService.update(dto, authentication);
+        return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", id + "번 댓글이 수정되었습니다.")));
+    }
 
     // 삭제
-
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> delete(@PathVariable Integer id,
+                                    Authentication authentication) {
+        try {
+            commentService.deleteById(id, authentication);
+            return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", id + "번 댓글이 삭제되었습니다.")));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", Map.of("type", "error", "text", e.getMessage())));
+        }
+    }
 }
