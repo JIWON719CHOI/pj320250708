@@ -22,9 +22,6 @@ export function BoardDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // 댓글 목록 상태
-  const [comments, setComments] = useState([]);
-
   // 게시글 불러오기
   useEffect(() => {
     axios
@@ -41,25 +38,6 @@ export function BoardDetail() {
         }
       });
   }, [id, navigate]);
-
-  // 게시글이 바뀌면 댓글 목록도 다시 불러오기
-  useEffect(() => {
-    if (board) {
-      fetchComments();
-    }
-  }, [board]);
-
-  // 댓글 목록 API 호출
-  function fetchComments() {
-    axios
-      .get(`/api/comment/list?boardId=${board.id}`)
-      .then((res) => {
-        setComments(res.data.comments); // API 응답 구조에 맞게 조정하세요
-      })
-      .catch(() => {
-        toast.error("댓글을 불러오는 중 오류가 발생했습니다.");
-      });
-  }
 
   // 게시글 삭제
   function handleDeleteButtonClick() {
@@ -131,32 +109,9 @@ export function BoardDetail() {
             </Button>
           </div>
         )}
-
-        {/* 댓글 목록 출력 */}
-        <div className="mt-4">
-          <h4>댓글 목록</h4>
-          {comments.length === 0 ? (
-            <p>댓글이 없습니다.</p>
-          ) : (
-            comments.map((comment) => (
-              <div
-                key={comment.id}
-                className="border rounded p-2 mb-2"
-                style={{ whiteSpace: "pre-wrap" }}
-              >
-                <b>{comment.authorNickName}</b>
-                <br />
-                <small className="text-muted">
-                  {new Date(comment.insertedAt).toLocaleString()}
-                </small>
-                <p>{comment.comment}</p>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* 댓글 입력 창 */}
-        <CommentContainer boardId={board.id} onCommentSaved={fetchComments} />
+        <br />
+        {/* 댓글 목록 + 입력 컴포넌트 */}
+        <CommentContainer boardId={board.id} />
       </Col>
 
       <Modal show={modalShow} onHide={() => setModalShow(false)}>

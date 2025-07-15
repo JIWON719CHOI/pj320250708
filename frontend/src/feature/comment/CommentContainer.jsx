@@ -1,45 +1,33 @@
-import { Button, FormControl } from "react-bootstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import CommentAdd from "./CommentAdd";
+import CommentList from "./CommentList";
 
-export function CommentContainer({ boardId, onCommentSaved }) {
-  const [comment, setComment] = useState("");
+export function CommentContainer({ boardId }) {
+  const [commentList, setCommentList] = useState([]);
 
-  // 댓글 저장 처리
-  function handleCommentSaveClick() {
-    if (!comment.trim()) {
-      alert("댓글 내용을 입력하세요.");
-      return;
-    }
-
+  function fetchComments() {
     axios
-      .post("/api/comment", { boardId: boardId, comment: comment })
-      .then(() => {
-        setComment("");
-        toast.success("댓글이 등록되었습니다.");
-        // 댓글 저장 성공 시 부모 컴포넌트에서 댓글 목록을 다시 불러올 수 있게 콜백 호출
-        if (onCommentSaved) {
-          onCommentSaved();
-        }
+      .get(`/api/comment/list?boardId=${boardId}`)
+      .then((res) => {
+        console.log("댓글 목록:", res.data);
+        setCommentList(Array.isArray(res.data) ? res.data : res.data.comments); // 구조에 따라 조절
       })
       .catch(() => {
-        toast.error("댓글 등록 중 오류가 발생했습니다.");
+        toast.error("댓글 목록 불러오기 실패");
       });
   }
+
+  useEffect(() => {
+    fetchComments();
+  }, [boardId]);
 
   return (
     <div>
       <h3>댓글 창</h3>
-      <FormControl
-        as="textarea"
-        rows={3}
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
-      <Button onClick={handleCommentSaveClick} className="mt-2">
-        댓글 저장
-      </Button>
+      <CommentList comments={commentList} />
+      <CommentAdd boardId={boardId} onCommentSaved={fetchComments} />
     </div>
   );
 }

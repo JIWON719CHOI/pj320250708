@@ -12,6 +12,8 @@ export function MainLayout() {
       <Container className="flex-grow-1" style={{ paddingTop: "80px" }}>
         <Outlet />
       </Container>
+      <br />
+      <br />
       <AppFooter />
     </div>
   );
