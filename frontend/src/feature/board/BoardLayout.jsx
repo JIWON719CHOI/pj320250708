@@ -1,6 +1,9 @@
 import { Accordion, Carousel, Tab, Tabs } from "react-bootstrap";
 import { useState } from "react";
 import { BoardListMini } from "./BoardListMini.jsx";
+import img1 from "../../assets/01.png";
+import img2 from "../../assets/02.jpg";
+import img3 from "../../assets/03.jpg";
 
 export function BoardLayout() {
   const [activeTab, setActiveTab] = useState("2"); // 탭 상태
@@ -8,21 +11,60 @@ export function BoardLayout() {
   return (
     <div>
       {/* Carousel: 이미지 lazy 로딩 및 사이즈 축소 */}
-      <Carousel className="mb-5">
-        {[1011, 1015, 1025].map((id, index) => (
-          <Carousel.Item key={id}>
-            <img
-              className="d-block w-100"
-              src={`https://picsum.photos/id/${id}/800/200`} // 세로 크기 줄임
-              alt={`${index + 1}번째 슬라이드`}
-              loading="lazy"
-            />
-            <Carousel.Caption>
-              <h5>{index + 1}번째 슬라이드</h5>
-              <p>{["똥마려워", "피곤하다", "집에갈래"][index]}</p>
-            </Carousel.Caption>
-          </Carousel.Item>
-        ))}
+      <Carousel
+        className="mb-4"
+        style={{ maxHeight: "200px", overflow: "hidden" }}
+      >
+        <Carousel.Item>
+          <img
+            className="d-block w-100"
+            src={img1}
+            alt="1번째 슬라이드"
+            loading="lazy"
+            style={{
+              height: "200px",
+              objectFit: "cover",
+            }}
+          />
+          <Carousel.Caption>
+            <h6>1번째 슬라이드</h6>
+            <p className="d-none d-md-block">똥마려워</p>
+          </Carousel.Caption>
+        </Carousel.Item>
+
+        <Carousel.Item>
+          <img
+            className="d-block w-100"
+            src={img2}
+            alt="2번째 슬라이드"
+            loading="lazy"
+            style={{
+              height: "200px",
+              objectFit: "cover",
+            }}
+          />
+          <Carousel.Caption>
+            <h6>2번째 슬라이드</h6>
+            <p className="d-none d-md-block">피곤하다</p>
+          </Carousel.Caption>
+        </Carousel.Item>
+
+        <Carousel.Item>
+          <img
+            className="d-block w-100"
+            src={img3}
+            alt="3번째 슬라이드"
+            loading="lazy"
+            style={{
+              height: "200px",
+              objectFit: "cover",
+            }}
+          />
+          <Carousel.Caption>
+            <h6>3번째 슬라이드</h6>
+            <p className="d-none d-md-block">집에갈래</p>
+          </Carousel.Caption>
+        </Carousel.Item>
       </Carousel>
 
       {/* Tabs: 선택된 탭에만 BoardListMini 렌더링 */}
@@ -42,7 +84,7 @@ export function BoardLayout() {
       </Tabs>
 
       {/* Accordion은 트래픽과 무관하므로 유지 */}
-      <Accordion defaultActiveKey="1" className="my-3">
+      <Accordion defaultActiveKey="0" className="my-3">
         <Accordion.Item eventKey="1">
           <Accordion.Header>지금 피곤한가요?</Accordion.Header>
           <Accordion.Body>네.</Accordion.Body>
