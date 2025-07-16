@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class BoardAddForm {
+    private Integer id;
     private String title;
     private String content;
     private List<MultipartFile> files;

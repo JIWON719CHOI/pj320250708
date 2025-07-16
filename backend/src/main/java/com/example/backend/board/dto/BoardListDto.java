@@ -19,6 +19,7 @@ public class BoardListDto {
     private LocalDateTime insertedAt;
     private Long countComment;
     private Long countLike;
+    private Long countFile;
 
     // 안쓰는게 아니라 프론트에서 사용하면 IJ 가 인식을 못할 뿐.
     public String getTimesAgo() {

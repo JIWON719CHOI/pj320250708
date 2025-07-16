@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -59,13 +60,31 @@ public class BoardController {
     // ✅ 수정 (본인만 가능)
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody BoardDto dto, Authentication authentication) {
-        dto.setId(id);
-        if (!boardService.validate(dto)) {
-            return ResponseEntity.badRequest().body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
+    public ResponseEntity<?> update(
+            @PathVariable Integer id,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files,
+            @RequestParam(value = "deleteFileNames", required = false) List<String> deleteFileNames,
+            Authentication authentication
+    ) {
+        BoardAddForm form = new BoardAddForm();
+        form.setId(id);
+        form.setTitle(title);
+        form.setContent(content);
+        form.setFiles(files); // 새로 추가된 파일
+
+        if (!boardService.validateForAdd(form)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")
+            ));
         }
-        boardService.update(dto, authentication);
-        return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", id + "번 게시물이 수정되었습니다.")));
+
+        boardService.updateWithFiles(id, form, deleteFileNames, authentication);
+
+        return ResponseEntity.ok(Map.of(
+                "message", Map.of("type", "success", "text", id + "번 게시물이 수정되었습니다.")
+        ));
     }
 
     @GetMapping("/latest")

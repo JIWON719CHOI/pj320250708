@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
-import { FaRegComments, FaThumbsUp } from "react-icons/fa";
+import { FaRegComments, FaRegImages, FaThumbsUp } from "react-icons/fa";
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
@@ -139,6 +139,16 @@ export function BoardList() {
                               <div className="d-flex gap-1">
                                 <FaRegComments />
                                 <span>{board.countComment}</span>
+                              </div>
+                            </Badge>
+                          )}
+                        </span>
+                        <span>
+                          {board.countFile > 0 && (
+                            <Badge bg="info">
+                              <div className="d-flex gap-1">
+                                <FaRegImages />
+                                <span>{board.countFile}</span>
                               </div>
                             </Badge>
                           )}

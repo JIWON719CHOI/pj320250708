@@ -73,7 +73,7 @@ export function BoardDetail() {
     <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h3 className="fw-bold mb-0 text-primary">{board.title}</h3>
+          <h3 className="fw-bold mb-0 text-dark">{board.title}</h3>
           <small className="text-muted" style={{ fontSize: "0.85rem" }}>
             #{board.id}
           </small>
@@ -81,6 +81,7 @@ export function BoardDetail() {
 
         <Card className="mb-4 shadow-sm border-0 rounded-3">
           <Card.Body>
+            <br />
             <Card.Text
               className="mb-4 text-secondary"
               style={{
@@ -111,43 +112,49 @@ export function BoardDetail() {
                     ))}
                 </div>
               )}
-
+            <br />
             {/* 첨부 파일 목록 */}
             {Array.isArray(board.files) && board.files.length > 0 && (
               <div className="mb-4">
-                <strong className="d-block mb-2">첨부 파일</strong>
                 <ListGroup variant="flush">
-                  {board.files.map((file, idx) => (
-                    <ListGroupItem
-                      key={idx}
-                      className="d-flex justify-content-between align-items-center py-2 px-0"
-                    >
-                      <span
-                        className="text-truncate"
-                        style={{ maxWidth: "80%" }}
-                        title={file.split("/").pop()}
+                  {board.files.map((file, idx) => {
+                    const fileName = file.split("/").pop();
+                    return (
+                      <ListGroupItem
+                        key={idx}
+                        className="d-flex justify-content-between align-items-center px-2 py-1 border-0"
+                        style={{
+                          fontSize: "0.85rem",
+                          color: "#6c757d",
+                          backgroundColor: "transparent",
+                        }}
                       >
-                        {file.split("/").pop()}
-                      </span>
-                      <OverlayTrigger
-                        placement="top"
-                        overlay={
-                          <Tooltip id="tooltip-download">다운로드</Tooltip>
-                        }
-                      >
+                        <span
+                          className="text-truncate"
+                          style={{
+                            maxWidth: "85%",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                          title={fileName}
+                        >
+                          {fileName}
+                        </span>
                         <Button
                           variant="outline-primary"
                           size="sm"
                           href={file}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="d-flex align-items-center gap-1"
+                          className="d-flex align-items-center justify-content-center p-1"
+                          style={{ fontSize: "0.8rem" }}
                         >
                           <FaDownload />
                         </Button>
-                      </OverlayTrigger>
-                    </ListGroupItem>
-                  ))}
+                      </ListGroupItem>
+                    );
+                  })}
                 </ListGroup>
               </div>
             )}
