@@ -1,5 +1,6 @@
 import {
   Alert,
+  Badge,
   Button,
   Col,
   Form,
@@ -13,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
+import { FaComment, FaRegComments, FaThumbsUp } from "react-icons/fa"; // FaThumbsUp으로 변경
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
@@ -23,16 +25,12 @@ export function BoardList() {
   const navigate = useNavigate();
   const [keywords, setKeywords] = useState("");
 
-  // 검색어가 URL 쿼리 파라미터 변경에 따라 동기화
   useEffect(() => {
-    const q = searchParams.get("q");
-    setKeywords(q ?? "");
+    setKeywords(searchParams.get("q") ?? "");
   }, [searchParams]);
 
-  // 게시판 목록 불러오기 (로그인 여부와 무관)
   useEffect(() => {
     const page = searchParams.get("p") ?? "1";
-
     axios
       .get("/api/board/list", { params: { q: keyword, p: page } })
       .then((res) => {
@@ -42,21 +40,19 @@ export function BoardList() {
       })
       .catch((err) => {
         setBoardList(null);
-        if (err.response?.status === 401) {
-          setErrorMsg("권한이 없습니다. 로그인 후 다시 시도하세요.");
-        } else {
-          setErrorMsg("게시글을 불러오는 중 오류가 발생했습니다.");
-        }
+        setErrorMsg(
+          err.response?.status === 401
+            ? "권한이 없습니다. 로그인 후 다시 시도하세요."
+            : "게시글을 불러오는 중 오류가 발생했습니다.",
+        );
       });
   }, [keyword, searchParams]);
 
-  // 검색 폼 제출
   function handleSearchFormSubmit(e) {
     e.preventDefault();
     navigate("/board/list?q=" + encodeURIComponent(keywords));
   }
 
-  // 게시글 클릭 시 상세페이지로 이동
   function handleTableRowClick(id) {
     navigate(`/board/${id}`);
   }
@@ -83,7 +79,6 @@ export function BoardList() {
     );
   }
 
-  // 페이지 번호 배열 생성
   const pageNumbers = [];
   if (pageInfo) {
     for (let i = pageInfo.leftPageNumber; i <= pageInfo.rightPageNumber; i++) {
@@ -91,11 +86,10 @@ export function BoardList() {
     }
   }
 
-  // 페이지 이동 처리
   function handlePageNumberClick(pageNumber) {
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.set("p", pageNumber);
-    setSearchParams(nextSearchParams);
+    const next = new URLSearchParams(searchParams);
+    next.set("p", pageNumber);
+    setSearchParams(next);
   }
 
   return (
@@ -111,10 +105,16 @@ export function BoardList() {
             >
               <thead>
                 <tr>
-                  <th style={{ width: "60px" }}>#</th>
-                  <th style={{ width: "75%" }}>제목</th>
-                  <th style={{ width: "20%" }}>작성자</th>
-                  <th style={{ width: "25%" }}>작성일시</th>
+                  <th style={{ width: "45px" }}>#</th>
+                  <th style={{ width: "45px" }}>
+                    <FaThumbsUp
+                      size={14}
+                      className="text-secondary text-black"
+                    />
+                  </th>
+                  <th style={{ width: "95%" }}>제목</th>
+                  <th style={{ width: "30%" }}>작성자</th>
+                  <th style={{ width: "30%" }}>작성일시</th>
                 </tr>
               </thead>
               <tbody>
@@ -125,23 +125,25 @@ export function BoardList() {
                     onClick={() => handleTableRowClick(board.id)}
                   >
                     <td>{board.id}</td>
-                    <td
-                      style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                      title={board.title}
-                    >
-                      {board.title}{" "}
-                      {board.countComment > 0 && (
-                        <span
-                          className="badge bg-secondary ms-1"
-                          style={{ fontSize: "0.75em" }}
-                        >
-                          {board.countComment}
+                    <td>
+                      <span className="ms-1" style={{ fontSize: "0.85em" }}>
+                        {board.countLike}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="d-flex gap-2">
+                        <span>{board.title}</span>
+                        <span>
+                          {board.countComment > 0 && (
+                            <Badge bg="light" text="dark">
+                              <div className="d-flex gap-1">
+                                <FaRegComments />
+                                <span>{board.countComment}</span>
+                              </div>
+                            </Badge>
+                          )}
                         </span>
-                      )}
+                      </div>
                     </td>
                     <td
                       style={{
@@ -180,13 +182,13 @@ export function BoardList() {
                   handlePageNumberClick(pageInfo.leftPageNumber - 10)
                 }
               />
-              {pageNumbers.map((pageNumber) => (
+              {pageNumbers.map((num) => (
                 <Pagination.Item
-                  key={pageNumber}
-                  active={pageInfo.currentPageNumber === pageNumber}
-                  onClick={() => handlePageNumberClick(pageNumber)}
+                  key={num}
+                  active={pageInfo.currentPageNumber === num}
+                  onClick={() => handlePageNumberClick(num)}
                 >
-                  {pageNumber}
+                  {num}
                 </Pagination.Item>
               ))}
               <Pagination.Next

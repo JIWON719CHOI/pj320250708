@@ -1,7 +1,8 @@
-import { Table, Spinner, Alert } from "react-bootstrap";
+import { Table, Spinner, Alert, Badge } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { FaComment, FaRegComments, FaThumbsUp } from "react-icons/fa";
 
 export function BoardListMini() {
   const [boardList, setBoardList] = useState([]);
@@ -59,9 +60,12 @@ export function BoardListMini() {
     >
       <thead>
         <tr>
-          <th style={{ width: "60px" }}>#</th>
-          <th style={{ width: "50%" }}>제목</th>
-          <th style={{ width: "20%" }}>작성자</th>
+          <th style={{ width: "45px" }}>#</th>
+          <th style={{ width: "45px" }}>
+            <FaThumbsUp size={14} className="text-secondary text-black" />
+          </th>
+          <th style={{ width: "95%" }}>제목</th>
+          <th style={{ width: "30%" }}>작성자</th>
           <th style={{ width: "30%" }}>작성일시</th>
         </tr>
       </thead>
@@ -73,23 +77,25 @@ export function BoardListMini() {
             onClick={() => navigate(`/board/${board.id}`)}
           >
             <td>{board.id}</td>
-            <td
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-              title={board.title}
-            >
-              {board.title}{" "}
-              {board.countComment > 0 && (
-                <span
-                  className="badge bg-secondary ms-2"
-                  style={{ fontSize: "0.75em" }}
-                >
-                  {board.countComment}
+            <td>
+              <span className="ms-1" style={{ fontSize: "0.85em" }}>
+                {board.countLike}
+              </span>
+            </td>
+            <td>
+              <div className="d-flex gap-2">
+                <span>{board.title}</span>
+                <span>
+                  {board.countComment > 0 && (
+                    <Badge bg="light" text="dark">
+                      <div className="d-flex gap-1">
+                        <FaRegComments />
+                        <span>{board.countComment}</span>
+                      </div>
+                    </Badge>
+                  )}
                 </span>
-              )}
+              </div>
             </td>
             <td
               style={{
