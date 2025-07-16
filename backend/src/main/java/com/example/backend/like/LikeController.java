@@ -1,5 +1,6 @@
 package com.example.backend.like;
 
+import com.example.backend.like.dto.BoardLikeDto;
 import com.example.backend.like.dto.LikeForm;
 import com.example.backend.like.service.LikeService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,12 @@ public class LikeController {
         likeService.update(likeForm, authentication);
     }
 
-    @GetMapping("/count")
-    public int likeCount(@RequestParam Integer boardId) {
-        return likeService.count(boardId);
+    @GetMapping("board/{boardId}")
+    public BoardLikeDto get(
+            @PathVariable("boardId") Integer boardId,
+            Authentication authentication) {
+
+        return likeService.get(boardId, authentication);
     }
 
 

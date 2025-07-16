@@ -1,12 +1,11 @@
 package com.example.backend.like.service;
 
-import com.example.backend.board.entity.Board;
 import com.example.backend.board.repository.BoardRepository;
+import com.example.backend.like.dto.BoardLikeDto;
 import com.example.backend.like.dto.LikeForm;
 import com.example.backend.like.entity.BoardLike;
 import com.example.backend.like.entity.BoardLikeId;
 import com.example.backend.like.repository.BoardLikeRepository;
-import com.example.backend.member.entity.Member;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -53,7 +52,18 @@ public class LikeService {
         }
     }
 
-    public int count(Integer boardId) {
-        return boardLikeRepository.countByBoard_Id(boardId);
+    public BoardLikeDto get(Integer boardId, Authentication authentication) {
+        Long count = boardLikeRepository.countByBoardId(boardId);
+        Boolean liked = false;
+        if (authentication != null) {
+            var row = boardLikeRepository
+                    .findByBoardIdAndMemberEmail(boardId, authentication.getName());
+            liked = row.isPresent();
+        }
+        BoardLikeDto boardLikeDto = new BoardLikeDto();
+        boardLikeDto.setCount(count);
+        boardLikeDto.setLiked(liked);
+
+        return boardLikeDto;
     }
 }
