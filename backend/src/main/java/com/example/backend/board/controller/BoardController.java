@@ -1,4 +1,3 @@
-// ✅ BoardController.java - 완성본
 package com.example.backend.board.controller;
 
 import com.example.backend.board.dto.BoardDto;
@@ -21,11 +20,9 @@ public class BoardController {
     // ✅ 게시글 추가
     @PostMapping("/add")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> add(@RequestBody BoardDto dto,
-                                 Authentication authentication) {
+    public ResponseEntity<?> add(@RequestBody BoardDto dto, Authentication authentication) {
         if (!boardService.validate(dto)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
+            return ResponseEntity.badRequest().body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
         }
         boardService.add(dto, authentication);
         return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", "새 글이 저장되었습니다.")));
@@ -33,28 +30,23 @@ public class BoardController {
 
     // ✅ 전체 목록 조회
     @GetMapping("list")
-    public Map<String, Object> getAll(
-            @RequestParam(value = "q", defaultValue = "") String keyword,
-            @RequestParam(value = "p", defaultValue = "1") Integer pageNumber) {
+    public Map<String, Object> getAll(@RequestParam(value = "q", defaultValue = "") String keyword, @RequestParam(value = "p", defaultValue = "1") Integer pageNumber) {
 
         return boardService.list(keyword, pageNumber);
     }
 
 
     // ✅ 단건 조회 로그인한 사용자만 상세 글 조회 가능하게 설정
+    // @PreAuthorize("isAuthenticated()") 제거 (public 조회 허용)
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<BoardDto> getById(@PathVariable Integer id) {
-        return boardService.getBoardById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return boardService.getBoardById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // ✅ 삭제 (본인만 가능)
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> delete(@PathVariable Integer id,
-                                    Authentication authentication) {
+    public ResponseEntity<?> delete(@PathVariable Integer id, Authentication authentication) {
         boardService.deleteById(id, authentication);
         return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", id + "번 게시물이 삭제되었습니다.")));
     }
@@ -62,13 +54,10 @@ public class BoardController {
     // ✅ 수정 (본인만 가능)
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> update(@PathVariable Integer id,
-                                    @RequestBody BoardDto dto,
-                                    Authentication authentication) {
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody BoardDto dto, Authentication authentication) {
         dto.setId(id);
         if (!boardService.validate(dto)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
+            return ResponseEntity.badRequest().body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
         }
         boardService.update(dto, authentication);
         return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", id + "번 게시물이 수정되었습니다.")));

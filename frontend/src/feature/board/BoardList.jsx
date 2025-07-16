@@ -1,19 +1,18 @@
 import {
+  Alert,
+  Button,
   Col,
+  Form,
+  FormControl,
+  InputGroup,
+  Pagination,
   Row,
   Spinner,
   Table,
-  Alert,
-  Pagination,
-  Form,
-  InputGroup,
-  FormControl,
-  Button,
 } from "react-bootstrap";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
-import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx"; // 경로는 상황에 맞게
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
@@ -22,31 +21,16 @@ export function BoardList() {
   const [pageInfo, setPageInfo] = useState(null);
   const keyword = searchParams.get("q") ?? "";
   const navigate = useNavigate();
-  const { user } = useContext(AuthenticationContext);
-
   const [keywords, setKeywords] = useState("");
 
-  function handleSearchFormSubmit(e) {
-    e.preventDefault();
-    navigate("/board/list?q=" + encodeURIComponent(keywords));
-  }
-
+  // 검색어가 URL 쿼리 파라미터 변경에 따라 동기화
   useEffect(() => {
     const q = searchParams.get("q");
-    if (q) {
-      setKeywords(q);
-    } else {
-      setKeywords("");
-    }
+    setKeywords(q ?? "");
   }, [searchParams]);
 
+  // 게시판 목록 불러오기 (로그인 여부와 무관)
   useEffect(() => {
-    if (!user) {
-      setErrorMsg("로그인이 필요합니다.");
-      setBoardList(null);
-      return;
-    }
-
     const page = searchParams.get("p") ?? "1";
 
     axios
@@ -64,8 +48,15 @@ export function BoardList() {
           setErrorMsg("게시글을 불러오는 중 오류가 발생했습니다.");
         }
       });
-  }, [searchParams]);
+  }, [keyword, searchParams]);
 
+  // 검색 폼 제출
+  function handleSearchFormSubmit(e) {
+    e.preventDefault();
+    navigate("/board/list?q=" + encodeURIComponent(keywords));
+  }
+
+  // 게시글 클릭 시 상세페이지로 이동
   function handleTableRowClick(id) {
     navigate(`/board/${id}`);
   }
@@ -92,11 +83,15 @@ export function BoardList() {
     );
   }
 
+  // 페이지 번호 배열 생성
   const pageNumbers = [];
-  for (let i = pageInfo.leftPageNumber; i <= pageInfo.rightPageNumber; i++) {
-    pageNumbers.push(i);
+  if (pageInfo) {
+    for (let i = pageInfo.leftPageNumber; i <= pageInfo.rightPageNumber; i++) {
+      pageNumbers.push(i);
+    }
   }
 
+  // 페이지 이동 처리
   function handlePageNumberClick(pageNumber) {
     const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.set("p", pageNumber);
@@ -170,55 +165,58 @@ export function BoardList() {
           )}
         </Col>
       </Row>
-      <Row className="my-3">
-        <Col>
-          <Pagination className="justify-content-center">
-            <Pagination.First
-              disabled={pageInfo.currentPageNumber === 1}
-              onClick={() => handlePageNumberClick(1)}
-            ></Pagination.First>
-            <Pagination.Prev
-              disabled={pageInfo.leftPageNumber <= 1}
-              onClick={() =>
-                handlePageNumberClick(pageInfo.leftPageNumber - 10)
-              }
-            ></Pagination.Prev>
-            {pageNumbers.map((pageNumber) => (
-              <Pagination.Item
-                key={pageNumber}
-                onClick={() => handlePageNumberClick(pageNumber)}
-                active={pageInfo.currentPageNumber === pageNumber}
-              >
-                {pageNumber}
-              </Pagination.Item>
-            ))}
-            <Pagination.Next
-              disabled={pageInfo.rightPageNumber >= pageInfo.totalPages}
-              onClick={() =>
-                handlePageNumberClick(pageInfo.rightPageNumber + 1)
-              }
-            ></Pagination.Next>
-            <Pagination.Last
-              disabled={pageInfo.currentPageNumber === pageInfo.totalPages}
-              onClick={() => handlePageNumberClick(pageInfo.totalPages)}
-            ></Pagination.Last>
-          </Pagination>
-          <Form
-            onSubmit={handleSearchFormSubmit}
-            className="order-lg-2 mx-lg-auto justify-content-center"
-            style={{ maxWidth: "500px" }} // 폼 전체 너비 제한
-          >
-            <InputGroup style={{ width: "100%" }}>
-              <FormControl
-                value={keywords}
-                onChange={(e) => setKeywords(e.target.value)}
-                placeholder="(제목+내용)"
+
+      {pageInfo && (
+        <Row className="my-3">
+          <Col>
+            <Pagination className="justify-content-center">
+              <Pagination.First
+                disabled={pageInfo.currentPageNumber === 1}
+                onClick={() => handlePageNumberClick(1)}
               />
-              <Button type="submit">검색</Button>
-            </InputGroup>
-          </Form>
-        </Col>
-      </Row>
+              <Pagination.Prev
+                disabled={pageInfo.leftPageNumber <= 1}
+                onClick={() =>
+                  handlePageNumberClick(pageInfo.leftPageNumber - 10)
+                }
+              />
+              {pageNumbers.map((pageNumber) => (
+                <Pagination.Item
+                  key={pageNumber}
+                  active={pageInfo.currentPageNumber === pageNumber}
+                  onClick={() => handlePageNumberClick(pageNumber)}
+                >
+                  {pageNumber}
+                </Pagination.Item>
+              ))}
+              <Pagination.Next
+                disabled={pageInfo.rightPageNumber >= pageInfo.totalPages}
+                onClick={() =>
+                  handlePageNumberClick(pageInfo.rightPageNumber + 1)
+                }
+              />
+              <Pagination.Last
+                disabled={pageInfo.currentPageNumber === pageInfo.totalPages}
+                onClick={() => handlePageNumberClick(pageInfo.totalPages)}
+              />
+            </Pagination>
+            <Form
+              onSubmit={handleSearchFormSubmit}
+              className="order-lg-2 mx-lg-auto justify-content-center"
+              style={{ maxWidth: "500px" }}
+            >
+              <InputGroup style={{ width: "100%" }}>
+                <FormControl
+                  value={keywords}
+                  onChange={(e) => setKeywords(e.target.value)}
+                  placeholder="(제목+내용)"
+                />
+                <Button type="submit">검색</Button>
+              </InputGroup>
+            </Form>
+          </Col>
+        </Row>
+      )}
     </>
   );
 }

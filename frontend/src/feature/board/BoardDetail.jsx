@@ -31,11 +31,11 @@ export function BoardDetail() {
         setBoard(res.data);
       })
       .catch((err) => {
-        if (err.response?.status === 401) {
-          toast.warning("로그인이 필요합니다.");
-          navigate("/login");
-        } else {
+        if (err.response?.status === 404) {
           toast.warning("해당 게시물이 없습니다.");
+          navigate("/");
+        } else {
+          toast.error("게시글을 불러오는 중 오류가 발생했습니다.");
         }
       });
   }, [id, navigate]);
