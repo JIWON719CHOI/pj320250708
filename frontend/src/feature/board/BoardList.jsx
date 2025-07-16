@@ -169,9 +169,13 @@ export function BoardList() {
       </Row>
 
       {pageInfo && (
-        <Row className="my-3">
-          <Col>
-            <Pagination className="justify-content-center">
+        <Row className="my-3 justify-content-center mx-0">
+          <Col
+            xs="auto"
+            className="mx-auto"
+            style={{ maxWidth: "500px", width: "100%" }}
+          >
+            <Pagination className="justify-content-center mb-3 d-flex">
               <Pagination.First
                 disabled={pageInfo.currentPageNumber === 1}
                 onClick={() => handlePageNumberClick(1)}
@@ -202,11 +206,8 @@ export function BoardList() {
                 onClick={() => handlePageNumberClick(pageInfo.totalPages)}
               />
             </Pagination>
-            <Form
-              onSubmit={handleSearchFormSubmit}
-              className="order-lg-2 mx-lg-auto justify-content-center"
-              style={{ maxWidth: "500px" }}
-            >
+
+            <Form onSubmit={handleSearchFormSubmit} className="d-flex">
               <InputGroup style={{ width: "100%" }}>
                 <FormControl
                   value={keywords}

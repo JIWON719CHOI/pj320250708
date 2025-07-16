@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router";
-import { Container, Nav, Navbar } from "react-bootstrap";
+import { Navbar, Nav, Container } from "react-bootstrap";
 import { useContext } from "react";
 import { AuthenticationContext } from "./AuthenticationContextProvider.jsx";
 
@@ -9,13 +9,30 @@ export function AppNavBar() {
   return (
     <Navbar expand="lg" bg="light" fixed="top" className="bg-body-tertiary">
       <Container className="d-flex align-items-center">
-        {/* 1. 브랜드 (왼쪽 끝) */}
-        <Navbar.Brand as={Link} to="/" className="fs-3 fw-bold">
+        {/* 1. 로고 */}
+        <Navbar.Brand as={Link} to="/" className="fs-3 fw-bold me-auto">
           PRJ3
         </Navbar.Brand>
 
-        {/* 2. 메뉴 (Collapse 안) */}
-        <Navbar.Collapse id="main-nav">
+        {/* 2. 로그인/닉네임 + 햄버거 토글 (항상 고정, Collapse 밖) */}
+        <div className="d-flex align-items-center order-lg-2">
+          <Nav className="me-3">
+            {!user ? (
+              <Nav.Link as={NavLink} to="/login">
+                로그인
+              </Nav.Link>
+            ) : (
+              <Nav.Link as={NavLink} to={`/member?email=${user.email}`}>
+                {user.nickName}
+              </Nav.Link>
+            )}
+          </Nav>
+
+          <Navbar.Toggle aria-controls="main-nav" />
+        </div>
+
+        {/* 3. 메뉴 (Collapse 안, order-lg-1로 로고 옆에 위치) */}
+        <Navbar.Collapse id="main-nav" className="order-lg-1">
           <Nav>
             <Nav.Link as={NavLink} to="/board/list">
               게시판 목록
@@ -32,23 +49,6 @@ export function AppNavBar() {
             )}
           </Nav>
         </Navbar.Collapse>
-
-        {/* 3. 로그인/닉네임 + 햄버거 토글 묶음 (오른쪽 끝에 고정) */}
-        <div className="d-flex align-items-center ms-auto">
-          <Nav className="me-3">
-            {!user ? (
-              <Nav.Link as={NavLink} to="/login">
-                로그인
-              </Nav.Link>
-            ) : (
-              <Nav.Link as={NavLink} to={`/member?email=${user.email}`}>
-                {user.nickName}
-              </Nav.Link>
-            )}
-          </Nav>
-
-          <Navbar.Toggle aria-controls="main-nav" />
-        </div>
       </Container>
     </Navbar>
   );
