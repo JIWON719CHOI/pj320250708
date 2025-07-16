@@ -63,7 +63,7 @@ export function BoardListMini() {
           </th>
           <th style={{ width: "95%" }}>제목</th>
           <th style={{ width: "30%" }}>작성자</th>
-          <th style={{ width: "30%" }}>작성일시</th>
+          <th style={{ width: "50%" }}>작성일시</th>
         </tr>
       </thead>
       <tbody>

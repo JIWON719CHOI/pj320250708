@@ -5,6 +5,7 @@ import CommentAdd from "./CommentAdd";
 import CommentList from "./CommentList";
 import { useContext } from "react";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider";
+import { Badge } from "react-bootstrap";
 
 export function CommentContainer({ boardId }) {
   const [commentList, setCommentList] = useState([]);
@@ -52,7 +53,17 @@ export function CommentContainer({ boardId }) {
 
   return (
     <div>
-      <h3>댓글 창 ({commentList.length})</h3>
+      <h5 className="mb-0" style={{ fontWeight: "600" }}>
+        댓글
+        <Badge
+          bg="primary"
+          pill
+          className="ms-1"
+          style={{ fontSize: "0.7rem" }}
+        >
+          {commentList.length}
+        </Badge>
+      </h5>
       <CommentList
         comments={commentList}
         onDelete={handleDelete}

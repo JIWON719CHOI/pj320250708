@@ -67,9 +67,10 @@ export function BoardDetail() {
   return (
     <Row className="justify-content-center">
       <Col xs={12} md={8} lg={6}>
-        <div className="d-flex justify-content-between">
-          <h2 className="mb-4">{board.id}번 게시물</h2>
-          <LikeContainer boardId={board.id} />
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h4 className="mb-0" style={{ fontWeight: "600" }}>
+            {board.id}번 게시물
+          </h4>
         </div>
 
         <FormGroup className="mb-3" controlId="title1">
@@ -95,36 +96,47 @@ export function BoardDetail() {
             value={formattedInsertedAt}
           />
         </FormGroup>
-
-        {hasAccess(board.authorEmail) && (
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          {/* 왼쪽: 수정/삭제 버튼 (권한 있을 때만) */}
           <div>
-            <Button
-              onClick={() => setModalShow(true)}
-              className="me-2"
-              variant="outline-danger"
-            >
-              삭제
-            </Button>
-            <Button
-              variant="outline-info"
-              onClick={() => navigate(`/board/edit?id=${board.id}`)}
-            >
-              수정
-            </Button>
+            {hasAccess(board.authorEmail) && (
+              <>
+                <Button
+                  onClick={() => setModalShow(true)}
+                  className="me-2"
+                  variant="outline-danger"
+                  size="sm"
+                >
+                  삭제
+                </Button>
+                <Button
+                  variant="outline-info"
+                  size="sm"
+                  onClick={() => navigate(`/board/edit?id=${board.id}`)}
+                >
+                  수정
+                </Button>
+              </>
+            )}
           </div>
-        )}
-        <hr className="my-5" />
+          {/* 오른쪽: 좋아요 버튼 */}
+          <LikeContainer boardId={board.id} />
+        </div>
+        <br />
         {/* 댓글 목록 + 입력 컴포넌트 */}
         <CommentContainer boardId={board.id} />
       </Col>
 
-      <Modal show={modalShow} onHide={() => setModalShow(false)}>
+      <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>게시물 삭제 확인</Modal.Title>
         </Modal.Header>
         <Modal.Body>{board.id}번 게시물을 삭제하시겠습니까?</Modal.Body>
         <Modal.Footer>
-          <Button variant="outline-dark" onClick={() => setModalShow(false)}>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setModalShow(false)}
+          >
             취소
           </Button>
           <Button variant="danger" onClick={handleDeleteButtonClick}>

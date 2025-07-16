@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.format.DateTimeFormatter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,22 +31,13 @@ public class BoardListDto {
 
         if (seconds < 60) {
             return "방금 전";
-        } else if (seconds < 60 * 60) { // 1 시간
+        } else if (seconds < 60 * 60) { // 1시간 미만
             long minutes = seconds / 60;
             return minutes + "분 전";
-        } else if (seconds < 60 * 60 * 24) { // 1 일
-            long hours = seconds / 3600;
-            return hours + "시간 전";
-        } else if (seconds < 60 * 60 * 24 * 7) { // 1주일
-            long days = seconds / 3600 / 24;
-            return days + "일 전";
-        } else if (seconds < 60 * 60 * 24 * 7 * 4) { // 4주
-            long weeks = seconds / 3600 / 24 * 7;
-            return weeks + "주 전";
         } else {
-            long days = duration.toDays();
-            long years = days / 365;
-            return years + "년 전";
+            // 1시간 이상부터는 절대 시간 표시 (yyyy-MM-dd-HH-mm)
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            return insertedAt.format(formatter);
         }
     }
 }

@@ -10,7 +10,7 @@ export function AppNavBar() {
     <Navbar expand="lg" bg="light" fixed="top" className="bg-body-tertiary">
       <Container className="d-flex align-items-center">
         {/* 1. 로고 */}
-        <Navbar.Brand as={Link} to="/" className="fs-3 fw-bold me-auto">
+        <Navbar.Brand as={Link} to="/" className="fs-3 fw-bold me-4">
           PRJ3
         </Navbar.Brand>
 

@@ -1,15 +1,13 @@
 import { useState } from "react";
 import CommentEdit from "./CommentEdit";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 function CommentList({ comments = [], onDelete, onUpdate, currentUserEmail }) {
   const [editingId, setEditingId] = useState(null);
-
-  // 모달 제어용 상태
   const [modalShow, setModalShow] = useState(false);
   const [selectedCommentId, setSelectedCommentId] = useState(null);
 
-  // 삭제 버튼 클릭 시
   const handleDeleteConfirm = () => {
     if (selectedCommentId !== null) {
       onDelete(selectedCommentId);
@@ -45,7 +43,7 @@ function CommentList({ comments = [], onDelete, onUpdate, currentUserEmail }) {
             />
           ) : (
             <>
-              <div className="d-flex justify-content-between">
+              <div className="d-flex justify-content-between align-items-center">
                 <div>
                   <strong style={{ fontSize: "0.9rem" }}>
                     {comment.authorNickName}
@@ -55,24 +53,45 @@ function CommentList({ comments = [], onDelete, onUpdate, currentUserEmail }) {
                   </small>
                 </div>
                 {comment.authorEmail === currentUserEmail && (
-                  <div className="d-flex gap-1">
-                    <Button
-                      variant="outline-secondary"
-                      size="sm"
-                      onClick={() => setEditingId(comment.id)}
+                  <div className="d-flex gap-2">
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id={`edit-tooltip-${comment.id}`}>
+                          수정
+                        </Tooltip>
+                      }
                     >
-                      수정
-                    </Button>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedCommentId(comment.id);
-                        setModalShow(true);
-                      }}
+                      <Button
+                        variant="link"
+                        className="p-0 text-primary"
+                        onClick={() => setEditingId(comment.id)}
+                        aria-label="댓글 수정"
+                      >
+                        <FaEdit size={16} />
+                      </Button>
+                    </OverlayTrigger>
+
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id={`delete-tooltip-${comment.id}`}>
+                          삭제
+                        </Tooltip>
+                      }
                     >
-                      삭제
-                    </Button>
+                      <Button
+                        variant="link"
+                        className="p-0 text-danger"
+                        onClick={() => {
+                          setSelectedCommentId(comment.id);
+                          setModalShow(true);
+                        }}
+                        aria-label="댓글 삭제"
+                      >
+                        <FaTrashAlt size={16} />
+                      </Button>
+                    </OverlayTrigger>
                   </div>
                 )}
               </div>
@@ -94,7 +113,6 @@ function CommentList({ comments = [], onDelete, onUpdate, currentUserEmail }) {
         </div>
       ))}
 
-      {/* 삭제 확인 모달 */}
       <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>댓글 삭제 확인</Modal.Title>
