@@ -163,7 +163,7 @@ public class BoardService {
             dto.setInsertedAt(b.getInsertedAt());
 
             List<String> fileUrls = b.getFiles().stream()
-                    .map(f -> "/upload/boardFile/" + b.getId() + "/" + f.getId().getName())
+                    .map(f -> "http://localhost:8080/boardFile/" + b.getId() + "/" + f.getId().getName())
                     .collect(Collectors.toList());
             dto.setFiles(fileUrls);
 

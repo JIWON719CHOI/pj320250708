@@ -24,27 +24,46 @@ export function BoardAdd() {
   const navigate = useNavigate();
 
   function handleSaveButtonClick() {
+    if (!validate) {
+      toast.warning("제목과 본문을 입력하세요.");
+      return;
+    }
+
     setIsProcessing(true);
+
+    // FormData 객체 생성
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+
+    // files 배열을 FormData에 append
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    // 백엔드 주소 맞춰서 수정하세요 (예: localhost:8080)
     axios
-      .postForm("/api/board/add", { title, content, files })
+      .post("/api/board/add", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
       .then((res) => {
-        const message = res.data.message;
-        // toast 띄우기
+        const message = res.data?.message;
         if (message) {
           toast(message.text, { type: message.type });
+        } else {
+          toast.success("게시글이 등록되었습니다.");
         }
-        // list 로 이동 : 화면 전환 용 함수. 프론트 엔드에서 쓰기 때문에 앞에 /api 안붙임 -> 서버통신 백엔드 전용
         navigate("/board/list");
       })
       .catch((err) => {
-        const message = err.response.data.message;
+        const message = err.response?.data?.message;
         if (message) {
-          // toast!
           toast(message.text, { type: message.type });
+        } else {
+          toast.error("오류가 발생했습니다.");
         }
       })
       .finally(() => {
-        console.log("ALWAYS");
         setIsProcessing(false);
       });
   }

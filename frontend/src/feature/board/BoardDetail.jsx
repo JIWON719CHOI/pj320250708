@@ -6,20 +6,18 @@ import {
   Button,
   Card,
   Col,
-  FormControl,
-  FormGroup,
-  FormLabel,
   ListGroup,
   ListGroupItem,
   Modal,
+  OverlayTrigger,
   Row,
   Spinner,
+  Tooltip,
 } from "react-bootstrap";
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { CommentContainer } from "../comment/CommentContainer.jsx";
 import { LikeContainer } from "../like/LikeContainer.jsx";
-
-// ... 생략된 import 및 useState, useEffect 등 동일
+import { FaDownload, FaTrashAlt, FaEdit } from "react-icons/fa";
 
 export function BoardDetail() {
   const [board, setBoard] = useState(null);
@@ -60,7 +58,11 @@ export function BoardDetail() {
   }
 
   if (!board) {
-    return <Spinner />;
+    return (
+      <div className="d-flex justify-content-center my-5">
+        <Spinner animation="border" role="status" />
+      </div>
+    );
   }
 
   const formattedInsertedAt = board.insertedAt
@@ -68,23 +70,23 @@ export function BoardDetail() {
     : "";
 
   return (
-    <Row className="justify-content-center">
+    <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <h4 className="mb-0 fw-bold">{board.title}</h4>
-          <span className="text-muted" style={{ fontSize: "0.9rem" }}>
-            {board.id}번 게시물
-          </span>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h3 className="fw-bold mb-0 text-primary">{board.title}</h3>
+          <small className="text-muted" style={{ fontSize: "0.85rem" }}>
+            #{board.id}
+          </small>
         </div>
 
-        <Card className="mb-3 shadow-sm">
+        <Card className="mb-4 shadow-sm border-0 rounded-3">
           <Card.Body>
             <Card.Text
               className="mb-4 text-secondary"
               style={{
                 whiteSpace: "pre-wrap",
-                minHeight: "100px",
-                fontSize: "1rem",
+                fontSize: "1.05rem",
+                lineHeight: 1.6,
               }}
             >
               {board.content}
@@ -95,7 +97,7 @@ export function BoardDetail() {
               board.files.some((file) =>
                 /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
               ) && (
-                <div className="mb-3 d-flex flex-column gap-2">
+                <div className="mb-4 d-flex flex-column gap-3">
                   {board.files
                     .filter((file) => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
                     .map((file, idx) => (
@@ -103,7 +105,8 @@ export function BoardDetail() {
                         key={idx}
                         src={file}
                         alt={`첨부 이미지 ${idx + 1}`}
-                        style={{ maxWidth: "100%", borderRadius: "8px" }}
+                        className="shadow rounded"
+                        style={{ maxWidth: "100%", objectFit: "contain" }}
                       />
                     ))}
                 </div>
@@ -111,29 +114,38 @@ export function BoardDetail() {
 
             {/* 첨부 파일 목록 */}
             {Array.isArray(board.files) && board.files.length > 0 && (
-              <div className="mb-3">
+              <div className="mb-4">
                 <strong className="d-block mb-2">첨부 파일</strong>
-                <ListGroup>
+                <ListGroup variant="flush">
                   {board.files.map((file, idx) => (
                     <ListGroupItem
                       key={idx}
-                      className="d-flex justify-content-between align-items-center"
+                      className="d-flex justify-content-between align-items-center py-2 px-0"
                     >
                       <span
                         className="text-truncate"
                         style={{ maxWidth: "80%" }}
+                        title={file.split("/").pop()}
                       >
                         {file.split("/").pop()}
                       </span>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        href={file}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={
+                          <Tooltip id="tooltip-download">다운로드</Tooltip>
+                        }
                       >
-                        다운로드
-                      </Button>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          href={file}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="d-flex align-items-center gap-1"
+                        >
+                          <FaDownload />
+                        </Button>
+                      </OverlayTrigger>
                     </ListGroupItem>
                   ))}
                 </ListGroup>
@@ -148,7 +160,7 @@ export function BoardDetail() {
                   <div>{board.authorNickName}</div>
                 </div>
               </Col>
-              <Col xs={6}>
+              <Col xs={6} className="text-end">
                 <div>
                   <strong>작성일시</strong>
                   <div>{formattedInsertedAt}</div>
@@ -158,24 +170,35 @@ export function BoardDetail() {
 
             {/* 버튼 및 좋아요 */}
             <div className="d-flex justify-content-between align-items-center">
-              <div>
+              <div className="d-flex">
                 {hasAccess(board.authorEmail) && (
                   <>
-                    <Button
-                      onClick={() => setModalShow(true)}
-                      className="me-2"
-                      variant="outline-danger"
-                      size="sm"
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip id="tooltip-delete">삭제</Tooltip>}
                     >
-                      삭제
-                    </Button>
-                    <Button
-                      variant="outline-info"
-                      size="sm"
-                      onClick={() => navigate(`/board/edit?id=${board.id}`)}
+                      <Button
+                        onClick={() => setModalShow(true)}
+                        className="me-2 d-flex align-items-center gap-1"
+                        variant="outline-danger"
+                        title="게시물 삭제"
+                      >
+                        <FaTrashAlt />
+                      </Button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip id="tooltip-edit">수정</Tooltip>}
                     >
-                      수정
-                    </Button>
+                      <Button
+                        variant="outline-info"
+                        className="d-flex align-items-center gap-1"
+                        onClick={() => navigate(`/board/edit?id=${board.id}`)}
+                        title="게시물 수정"
+                      >
+                        <FaEdit />
+                      </Button>
+                    </OverlayTrigger>
                   </>
                 )}
               </div>
@@ -187,6 +210,7 @@ export function BoardDetail() {
         <CommentContainer boardId={board.id} />
       </Col>
 
+      {/* 모달 */}
       <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>게시물 삭제 확인</Modal.Title>
