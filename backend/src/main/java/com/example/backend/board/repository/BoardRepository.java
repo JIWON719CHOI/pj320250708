@@ -34,7 +34,6 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
             """)
     Page<BoardListDto> findAllBy(String keyword, PageRequest pageRequest);
 
-
     @Modifying
     @Transactional
     @Query("DELETE FROM Board b WHERE b.author = :author")

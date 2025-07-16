@@ -19,6 +19,7 @@ public class BoardListDto {
     private Long countComment;
     private Long countLike;
 
+    // 안쓰는게 아니라 프론트에서 사용하면 IJ 가 인식을 못할 뿐.
     public String getTimesAgo() {
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         LocalDateTime insertedAt = this.getInsertedAt();

@@ -2,6 +2,7 @@ package com.example.backend.board.controller;
 
 import com.example.backend.board.dto.BoardAddForm;
 import com.example.backend.board.dto.BoardDto;
+import com.example.backend.board.dto.BoardListDto;
 import com.example.backend.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,11 +10,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/board")
 @RequiredArgsConstructor
+@RequestMapping("/api/board")
 public class BoardController {
 
     private final BoardService boardService;
@@ -25,24 +27,16 @@ public class BoardController {
         boolean result = boardService.validateForAdd(dto);
         if (result) {
             boardService.add(dto, authentication);
-
-            return ResponseEntity.ok().body(Map.of(
-                    "message", Map.of(
-                            "type", "success",
-                            "text", "새 글이 저장되었습니다.")));
+            return ResponseEntity.ok().body(Map.of("message", Map.of("type", "success", "text", "새 글이 저장되었습니다.")));
 
         } else {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", Map.of(
-                            "type", "error",
-                            "text", "입력한 내용이 유효하지 않습니다.")));
+            return ResponseEntity.badRequest().body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
         }
     }
 
     // ✅ 전체 목록 조회
     @GetMapping("list")
     public Map<String, Object> getAll(@RequestParam(value = "q", defaultValue = "") String keyword, @RequestParam(value = "p", defaultValue = "1") Integer pageNumber) {
-
         return boardService.list(keyword, pageNumber);
     }
 
@@ -72,5 +66,10 @@ public class BoardController {
         }
         boardService.update(dto, authentication);
         return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", id + "번 게시물이 수정되었습니다.")));
+    }
+
+    @GetMapping("/latest")
+    public List<BoardListDto> getLatestThree() {
+        return boardService.getLatestThree();
     }
 }

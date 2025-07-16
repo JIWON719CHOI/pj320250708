@@ -54,7 +54,7 @@ public class LikeService {
 
     public BoardLikeDto get(Integer boardId, Authentication authentication) {
         Long count = boardLikeRepository.countByBoardId(boardId);
-        Boolean liked = false;
+        boolean liked = false;
         if (authentication != null) {
             var row = boardLikeRepository
                     .findByBoardIdAndMemberEmail(boardId, authentication.getName());

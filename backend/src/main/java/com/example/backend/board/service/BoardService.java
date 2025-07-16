@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -55,7 +56,7 @@ public class BoardService {
 
     private void saveFiles(Board board, BoardAddForm dto) {
         List<MultipartFile> files = dto.getFiles();
-        if (files != null && files.size() > 0) {
+        if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
                 if (file != null && file.getSize() > 0) {
                     // board_file 테이블에 새 레코드 입력
@@ -87,7 +88,7 @@ public class BoardService {
                      */
                     try {
                         BufferedInputStream bi = new BufferedInputStream(file.getInputStream());
-                        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(new File(folder, file.getOriginalFilename())));
+                        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(new File(folder, Objects.requireNonNull(file.getOriginalFilename()))));
 
                         try (bi; bo) {
                             byte[] b = new byte[1024];
@@ -104,6 +105,34 @@ public class BoardService {
                 }
             }
         }
+    }
+
+    public void deleteById(Integer id, Authentication authentication) {
+        String email = authentication.getName();
+        Board board = boardRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 게시물이 없습니다."));
+        if (!board.getAuthor().getEmail().equals(email)) {
+            throw new RuntimeException("본인 게시물만 삭제할 수 있습니다.");
+        }
+        commentRepository.deleteByBoardId(id);
+        boardRepository.delete(board);
+    }
+
+    public void update(BoardDto dto, Authentication authentication) {
+        String email = authentication.getName();
+        Board board = boardRepository.findById(dto.getId()).orElseThrow(() -> new RuntimeException("해당 게시물이 없습니다."));
+        if (!board.getAuthor().getEmail().equals(email)) {
+            throw new RuntimeException("본인 게시물만 수정할 수 있습니다.");
+        }
+        board.setTitle(dto.getTitle().trim());
+        board.setContent(dto.getContent().trim());
+        boardRepository.save(board);
+    }
+
+    public boolean validateForAdd(BoardAddForm dto) {
+        if (dto.getTitle() == null || dto.getTitle().trim().isBlank()) return false;
+        if (dto.getContent() == null || dto.getContent().trim().isBlank()) return false;
+
+        return true;
     }
 
     public boolean validate(BoardDto dto) {
@@ -137,36 +166,7 @@ public class BoardService {
         });
     }
 
-    public void deleteById(Integer id, Authentication authentication) {
-        String email = authentication.getName();
-        Board board = boardRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 게시물이 없습니다."));
-        if (!board.getAuthor().getEmail().equals(email)) {
-            throw new RuntimeException("본인 게시물만 삭제할 수 있습니다.");
-        }
-        commentRepository.deleteByBoardId(id);
-        boardRepository.delete(board);
-    }
-
-    public void update(BoardDto dto, Authentication authentication) {
-        String email = authentication.getName();
-        Board board = boardRepository.findById(dto.getId()).orElseThrow(() -> new RuntimeException("해당 게시물이 없습니다."));
-        if (!board.getAuthor().getEmail().equals(email)) {
-            throw new RuntimeException("본인 게시물만 수정할 수 있습니다.");
-        }
-        board.setTitle(dto.getTitle().trim());
-        board.setContent(dto.getContent().trim());
-        boardRepository.save(board);
-    }
-
-    public boolean validateForAdd(BoardAddForm dto) {
-        if (dto.getTitle() == null || dto.getTitle().trim().isBlank()) {
-            return false;
-        }
-
-        if (dto.getContent() == null || dto.getContent().trim().isBlank()) {
-            return false;
-        }
-
-        return true;
+    public List<BoardListDto> getLatestThree() {
+        return boardRepository.findAllBy("", PageRequest.of(0, 3)).getContent();
     }
 }

@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -15,6 +16,7 @@ import java.util.Objects;
 @ToString
 @Embeddable
 public class BoardFileId implements Serializable {
+    @Serial
     private static final long serialVersionUID = 8839600998482464894L;
     @Column(name = "board_id", nullable = false)
     private Integer boardId;

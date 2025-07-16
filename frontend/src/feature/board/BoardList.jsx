@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router";
-import { FaComment, FaRegComments, FaThumbsUp } from "react-icons/fa"; // FaThumbsUp으로 변경
+import { FaRegComments, FaThumbsUp } from "react-icons/fa";
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);

@@ -1,8 +1,8 @@
-import { Table, Spinner, Alert, Badge } from "react-bootstrap";
+import { Alert, Badge, Spinner, Table } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import { FaComment, FaRegComments, FaThumbsUp } from "react-icons/fa";
+import { FaRegComments, FaThumbsUp } from "react-icons/fa";
 
 export function BoardListMini() {
   const [boardList, setBoardList] = useState([]);
@@ -15,12 +15,9 @@ export function BoardListMini() {
     setError(null);
 
     axios
-      .get("/api/board/list")
+      .get("/api/board/latest") // 변경된 API 호출
       .then((res) => {
-        const list = Array.isArray(res.data.boardList)
-          ? res.data.boardList
-          : [];
-        setBoardList(list.slice(0, 3)); // 여기서 미리 3개 자름
+        setBoardList(res.data); // 그대로 세팅 (이미 3개만 있음)
       })
       .catch((err) => {
         console.error(err);
