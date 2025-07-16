@@ -4,10 +4,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import {
   Button,
+  Card,
   Col,
   FormControl,
   FormGroup,
   FormLabel,
+  ListGroup,
+  ListGroupItem,
   Modal,
   Row,
   Spinner,
@@ -16,6 +19,8 @@ import { AuthenticationContext } from "../../common/AuthenticationContextProvide
 import { CommentContainer } from "../comment/CommentContainer.jsx";
 import { LikeContainer } from "../like/LikeContainer.jsx";
 
+// ... 생략된 import 및 useState, useEffect 등 동일
+
 export function BoardDetail() {
   const [board, setBoard] = useState(null);
   const [modalShow, setModalShow] = useState(false);
@@ -23,7 +28,6 @@ export function BoardDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // 게시글 불러오기
   useEffect(() => {
     axios
       .get(`/api/board/${id}`)
@@ -40,7 +44,6 @@ export function BoardDetail() {
       });
   }, [id, navigate]);
 
-  // 게시글 삭제
   function handleDeleteButtonClick() {
     axios
       .delete(`/api/board/${id}`)
@@ -53,7 +56,7 @@ export function BoardDetail() {
       })
       .catch(() => {
         toast.warning("게시물이 삭제되지 않았습니다.");
-      }, []);
+      });
   }
 
   if (!board) {
@@ -67,63 +70,120 @@ export function BoardDetail() {
   return (
     <Row className="justify-content-center">
       <Col xs={12} md={8} lg={6}>
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h4 className="mb-0" style={{ fontWeight: "600" }}>
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <h4 className="mb-0 fw-bold">{board.title}</h4>
+          <span className="text-muted" style={{ fontSize: "0.9rem" }}>
             {board.id}번 게시물
-          </h4>
+          </span>
         </div>
 
-        <FormGroup className="mb-3" controlId="title1">
-          <FormLabel>제목</FormLabel>
-          <FormControl readOnly value={board.title} />
-        </FormGroup>
+        <Card className="mb-3 shadow-sm">
+          <Card.Body>
+            <Card.Text
+              className="mb-4 text-secondary"
+              style={{
+                whiteSpace: "pre-wrap",
+                minHeight: "100px",
+                fontSize: "1rem",
+              }}
+            >
+              {board.content}
+            </Card.Text>
 
-        <FormGroup className="mb-3" controlId="content1">
-          <FormLabel>본문</FormLabel>
-          <FormControl as="textarea" rows={6} readOnly value={board.content} />
-        </FormGroup>
+            {/* 이미지 미리보기 */}
+            {Array.isArray(board.files) &&
+              board.files.some((file) =>
+                /\.(jpg|jpeg|png|gif|webp)$/i.test(file),
+              ) && (
+                <div className="mb-3 d-flex flex-column gap-2">
+                  {board.files
+                    .filter((file) => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
+                    .map((file, idx) => (
+                      <img
+                        key={idx}
+                        src={file}
+                        alt={`첨부 이미지 ${idx + 1}`}
+                        style={{ maxWidth: "100%", borderRadius: "8px" }}
+                      />
+                    ))}
+                </div>
+              )}
 
-        <FormGroup className="mb-3" controlId="author1">
-          <FormLabel>작성자</FormLabel>
-          <FormControl readOnly value={board.authorNickName} />
-        </FormGroup>
-
-        <FormGroup className="mb-3" controlId="insertedAt1">
-          <FormLabel>작성일시</FormLabel>
-          <FormControl
-            type="datetime-local"
-            readOnly
-            value={formattedInsertedAt}
-          />
-        </FormGroup>
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          {/* 왼쪽: 수정/삭제 버튼 (권한 있을 때만) */}
-          <div>
-            {hasAccess(board.authorEmail) && (
-              <>
-                <Button
-                  onClick={() => setModalShow(true)}
-                  className="me-2"
-                  variant="outline-danger"
-                  size="sm"
-                >
-                  삭제
-                </Button>
-                <Button
-                  variant="outline-info"
-                  size="sm"
-                  onClick={() => navigate(`/board/edit?id=${board.id}`)}
-                >
-                  수정
-                </Button>
-              </>
+            {/* 첨부 파일 목록 */}
+            {Array.isArray(board.files) && board.files.length > 0 && (
+              <div className="mb-3">
+                <strong className="d-block mb-2">첨부 파일</strong>
+                <ListGroup>
+                  {board.files.map((file, idx) => (
+                    <ListGroupItem
+                      key={idx}
+                      className="d-flex justify-content-between align-items-center"
+                    >
+                      <span
+                        className="text-truncate"
+                        style={{ maxWidth: "80%" }}
+                      >
+                        {file.split("/").pop()}
+                      </span>
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        href={file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        다운로드
+                      </Button>
+                    </ListGroupItem>
+                  ))}
+                </ListGroup>
+              </div>
             )}
-          </div>
-          {/* 오른쪽: 좋아요 버튼 */}
-          <LikeContainer boardId={board.id} />
-        </div>
-        <br />
-        {/* 댓글 목록 + 입력 컴포넌트 */}
+
+            {/* 작성자 / 작성일시 */}
+            <Row className="text-muted mb-3" style={{ fontSize: "0.9rem" }}>
+              <Col xs={6}>
+                <div>
+                  <strong>작성자</strong>
+                  <div>{board.authorNickName}</div>
+                </div>
+              </Col>
+              <Col xs={6}>
+                <div>
+                  <strong>작성일시</strong>
+                  <div>{formattedInsertedAt}</div>
+                </div>
+              </Col>
+            </Row>
+
+            {/* 버튼 및 좋아요 */}
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                {hasAccess(board.authorEmail) && (
+                  <>
+                    <Button
+                      onClick={() => setModalShow(true)}
+                      className="me-2"
+                      variant="outline-danger"
+                      size="sm"
+                    >
+                      삭제
+                    </Button>
+                    <Button
+                      variant="outline-info"
+                      size="sm"
+                      onClick={() => navigate(`/board/edit?id=${board.id}`)}
+                    >
+                      수정
+                    </Button>
+                  </>
+                )}
+              </div>
+              <LikeContainer boardId={board.id} />
+            </div>
+          </Card.Body>
+        </Card>
+
         <CommentContainer boardId={board.id} />
       </Col>
 

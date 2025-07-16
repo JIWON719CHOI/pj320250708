@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,4 +27,7 @@ public class Board {
 
     @Column(updatable = false, insertable = false) // 생성 시각 자동 default NOW();
     private LocalDateTime insertedAt;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<BoardFile> files = new ArrayList<>();
 }
