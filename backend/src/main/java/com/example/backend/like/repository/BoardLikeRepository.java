@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface BoardLikeRepository extends JpaRepository<BoardLike, BoardLikeId> {
     Optional<BoardLike> findByBoardIdAndMemberEmail(Integer boardId, String memberEmail);
+
+    int countByBoard_Id(Integer boardId); // 이거 추가
 }

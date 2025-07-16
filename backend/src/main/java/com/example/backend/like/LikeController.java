@@ -4,10 +4,7 @@ import com.example.backend.like.dto.LikeForm;
 import com.example.backend.like.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +16,12 @@ public class LikeController {
     @PutMapping
     public void like(@RequestBody LikeForm likeForm, Authentication authentication) {
         likeService.update(likeForm, authentication);
-
     }
+
+    @GetMapping("/count")
+    public int likeCount(@RequestParam Integer boardId) {
+        return likeService.count(boardId);
+    }
+
+
 }

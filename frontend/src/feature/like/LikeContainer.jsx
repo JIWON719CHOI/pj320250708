@@ -1,28 +1,33 @@
-import { FaRegThumbsUp, FaThumbsUp } from "react-icons/fa";
+import { FaThumbsUp } from "react-icons/fa";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function LikeContainer({ boardId }) {
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+
+  useEffect(() => {
+    fetchLikeCount();
+  }, []);
+
+  function fetchLikeCount() {
+    axios
+      .get("/api/like/count", { params: { boardId } })
+      .then((res) => setLikeCount(res.data));
+  }
 
   function handleThumbsClick() {
-    setIsProcessing(true);
     axios
-      .put("/api/like", { boardId: boardId })
-      .then((res) => {})
-      .catch((err) => console.log(err))
-      .finally(() => {
-        setIsProcessing(false);
-      });
+      .put("/api/like", { boardId })
+      .then(() => fetchLikeCount())
+      .catch((err) => console.error(err));
   }
 
   return (
     <div className="d-flex gap-2 h2">
-      <div onClick={handleThumbsClick}>
-        <FaRegThumbsUp />
+      <div onClick={handleThumbsClick} style={{ cursor: "pointer" }}>
         <FaThumbsUp />
       </div>
-      <div>9</div>
+      <div>{likeCount}</div>
     </div>
   );
 }
