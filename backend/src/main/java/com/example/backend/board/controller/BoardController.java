@@ -1,5 +1,6 @@
 package com.example.backend.board.controller;
 
+import com.example.backend.board.dto.BoardAddForm;
 import com.example.backend.board.dto.BoardDto;
 import com.example.backend.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,22 @@ public class BoardController {
     // ✅ 게시글 추가
     @PostMapping("/add")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> add(@RequestBody BoardDto dto, Authentication authentication) {
-        if (!boardService.validate(dto)) {
-            return ResponseEntity.badRequest().body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
+    public ResponseEntity<?> add(BoardAddForm dto, Authentication authentication) {
+        boolean result = boardService.validateForAdd(dto);
+        if (result) {
+            boardService.add(dto, authentication);
+
+            return ResponseEntity.ok().body(Map.of(
+                    "message", Map.of(
+                            "type", "success",
+                            "text", "새 글이 저장되었습니다.")));
+
+        } else {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", Map.of(
+                            "type", "error",
+                            "text", "입력한 내용이 유효하지 않습니다.")));
         }
-        boardService.add(dto, authentication);
-        return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", "새 글이 저장되었습니다.")));
     }
 
     // ✅ 전체 목록 조회

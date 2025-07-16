@@ -16,6 +16,7 @@ import { AuthenticationContext } from "../../common/AuthenticationContextProvide
 export function BoardAdd() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [files, setFiles] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const { user } = useContext(AuthenticationContext);
@@ -25,7 +26,7 @@ export function BoardAdd() {
   function handleSaveButtonClick() {
     setIsProcessing(true);
     axios
-      .post("/api/board/add", { title, content })
+      .postForm("/api/board/add", { title, content, files })
       .then((res) => {
         const message = res.data.message;
         // toast 띄우기
@@ -80,6 +81,17 @@ export function BoardAdd() {
             />
           </FormGroup>
         </div>
+        <div>
+          <FormGroup className="me-3" controlId="files1">
+            <FormLabel>파일 첨부</FormLabel>
+            <FormControl
+              type="file"
+              multiple
+              onChange={(e) => setFiles([...e.target.files])}
+            />
+          </FormGroup>
+        </div>
+        <br />
         <div>
           <FormGroup className="mb-3" controlId="author1">
             <FormLabel>작성자</FormLabel>
