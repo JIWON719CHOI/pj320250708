@@ -141,7 +141,7 @@ export function BoardList() {
                       {board.title}{" "}
                       {board.countComment > 0 && (
                         <span
-                          className="badge bg-secondary ms-2"
+                          className="badge bg-secondary ms-1"
                           style={{ fontSize: "0.75em" }}
                         >
                           {board.countComment}
