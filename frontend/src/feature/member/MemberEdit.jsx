@@ -1,7 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Button,
+  Card,
   Col,
   FormControl,
   FormGroup,
@@ -13,7 +14,6 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 export function MemberEdit() {
   // 상태 정의
@@ -26,7 +26,6 @@ export function MemberEdit() {
   const [newPassword2, setNewPassword2] = useState("");
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { logout } = useContext(AuthenticationContext);
 
   // 정규식
   const passwordRegex =
@@ -38,10 +37,19 @@ export function MemberEdit() {
     axios
       .get(`/api/member?email=${params.get("email")}`)
       .then((res) => setMember(res.data))
-      .catch((err) => console.error("회원 정보 로딩 실패", err));
-  }, []);
+      .catch((err) => {
+        console.error("회원 정보 로딩 실패", err);
+        toast.error("회원 정보를 불러오는 중 오류가 발생했습니다.");
+      });
+  }, [params]);
 
-  if (!member) return <Spinner />;
+  if (!member) {
+    return (
+      <div className="d-flex justify-content-center my-5">
+        <Spinner animation="border" role="status" />
+      </div>
+    );
+  }
 
   // 유효성
   const isNickNameValid = nickRegex.test(member.nickName);
@@ -56,6 +64,11 @@ export function MemberEdit() {
     !newPassword2 ||
     !isPasswordValid ||
     !isPasswordMatch;
+
+  // 가입일시 포맷 통일
+  const formattedInsertedAt = member.insertedAt
+    ? member.insertedAt.replace("T", " ").substring(0, 16)
+    : "";
 
   // 정보 수정 요청
   const handleSaveButtonClick = () => {
@@ -104,172 +117,213 @@ export function MemberEdit() {
   };
 
   return (
-    <Row className="justify-content-center">
+    <Row className="justify-content-center my-4">
       <Col xs={12} md={8} lg={6}>
-        <h2 className="mb-4">회원 정보 수정</h2>
-
-        <FormGroup controlId="email1" className="mb-3">
-          <FormLabel>이메일</FormLabel>
-          <FormControl disabled value={member.email} />
-        </FormGroup>
-
-        <div className="mb-4">
-          <Button
-            variant="outline-info"
-            onClick={() => setPasswordModalShow(true)}
-          >
-            비밀번호 변경
-          </Button>
+        {/* 상단 제목 및 이메일+관리자 배지 */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h3 className="fw-bold mb-0 text-dark">회원 정보</h3>
+          <small className="text-muted" style={{ fontSize: "0.85rem" }}>
+            {member.email === "admin@email.com" ? (
+              <span className="badge bg-danger">관리자</span>
+            ) : (
+              <span className="badge bg-secondary">일반 사용자</span>
+            )}
+          </small>
         </div>
 
-        <FormGroup controlId="nickName1" className="mb-3">
-          <FormLabel>별명</FormLabel>
-          <FormControl
-            value={member.nickName}
-            maxLength={20}
-            placeholder="2~20자, 한글/영문/숫자만 사용 가능"
-            onChange={(e) =>
-              setMember({
-                ...member,
-                nickName: e.target.value.replace(/\s/g, ""),
-              })
-            }
-          />
-          {member.nickName && !isNickNameValid && (
-            <FormText className="text-danger">
-              별명은 2~20자, 한글/영문/숫자만 사용할 수 있습니다.
-            </FormText>
-          )}
-        </FormGroup>
+        <Card className="shadow-sm border-0 rounded-3 mb-4">
+          <Card.Body>
+            <FormGroup controlId="email1" className="mb-3">
+              <FormLabel>이메일</FormLabel>
+              <FormControl
+                disabled
+                value={member.email}
+                className="bg-secondary bg-opacity-10 border-0"
+                style={{ userSelect: "text", color: "#6c757d" }}
+              />
+            </FormGroup>
 
-        <FormGroup controlId="info1" className="mb-3">
-          <FormLabel>자기소개</FormLabel>
-          <FormControl
-            as="textarea"
-            value={member.info}
-            maxLength={3000}
-            onChange={(e) => setMember({ ...member, info: e.target.value })}
-          />
-        </FormGroup>
+            <FormGroup controlId="nickName1" className="mb-3">
+              <FormLabel>별명</FormLabel>
+              <FormControl
+                value={member.nickName}
+                maxLength={20}
+                placeholder="2~20자, 한글/영문/숫자만 사용 가능"
+                onChange={(e) =>
+                  setMember({
+                    ...member,
+                    nickName: e.target.value.replace(/\s/g, ""),
+                  })
+                }
+                className="bg-light border-0"
+                style={{ userSelect: "text" }}
+              />
+              {member.nickName && !isNickNameValid && (
+                <FormText className="text-danger">
+                  별명은 2~20자, 한글/영문/숫자만 사용할 수 있습니다.
+                </FormText>
+              )}
+            </FormGroup>
 
-        <FormGroup controlId="insertedAt1" className="mb-3">
-          <FormLabel>가입일시</FormLabel>
-          <FormControl
-            type="datetime-local"
-            disabled
-            value={member.insertedAt}
-          />
-        </FormGroup>
+            <FormGroup controlId="info1" className="mb-3">
+              <FormLabel>자기소개</FormLabel>
+              <FormControl
+                as="textarea"
+                value={member.info || ""}
+                maxLength={3000}
+                onChange={(e) => setMember({ ...member, info: e.target.value })}
+                className="bg-light border-0"
+                style={{
+                  minHeight: "120px",
+                  resize: "none",
+                  userSelect: "text",
+                }}
+              />
+            </FormGroup>
 
-        <div>
-          <Button
-            className="me-2"
-            variant="outline-secondary"
-            onClick={() => navigate(-1)}
-          >
-            취소
-          </Button>
-          <Button
-            variant="primary"
-            disabled={isSaveDisabled}
-            onClick={() => setModalShow(true)}
-          >
-            저장
-          </Button>
-        </div>
+            <FormGroup controlId="insertedAt1" className="mb-3">
+              <FormLabel>가입일시</FormLabel>
+              <FormControl
+                disabled
+                value={formattedInsertedAt}
+                className="bg-secondary bg-opacity-10 border-0"
+                style={{ userSelect: "text", color: "#6c757d" }}
+              />
+            </FormGroup>
+
+            {/* 버튼 3개 - 탈퇴, 수정, 로그아웃과 같은 스타일과 위치 */}
+            <div className="d-flex justify-content-start gap-2">
+              <Button
+                variant="outline-secondary"
+                onClick={() => navigate(-1)}
+                className="d-flex align-items-center gap-1"
+              >
+                취소
+              </Button>
+              <Button
+                variant="primary"
+                disabled={isSaveDisabled}
+                onClick={() => setModalShow(true)}
+                className="d-flex align-items-center gap-1"
+              >
+                저장
+              </Button>
+              <Button
+                variant="outline-info"
+                onClick={() => setPasswordModalShow(true)}
+                className="d-flex align-items-center gap-1"
+              >
+                비밀번호 변경
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+
+        {/* 회원 정보 수정 확인 모달 */}
+        <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>회원 정보 수정 확인</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <FormGroup controlId="password1">
+              <FormLabel>암호</FormLabel>
+              <FormControl
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="현재 비밀번호를 입력하세요"
+                autoFocus
+              />
+            </FormGroup>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="outline-secondary"
+              onClick={() => setModalShow(false)}
+            >
+              취소
+            </Button>
+            <Button variant="primary" onClick={handleSaveButtonClick}>
+              저장
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* 비밀번호 변경 모달 */}
+        <Modal
+          show={passwordModalShow}
+          onHide={() => setPasswordModalShow(false)}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>비밀번호 변경</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <FormGroup className="mb-3" controlId="password2">
+              <FormLabel>현재 비밀번호</FormLabel>
+              <FormControl
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                className="bg-light border-0"
+                style={{ userSelect: "text" }}
+              />
+            </FormGroup>
+
+            <FormGroup className="mb-3" controlId="password3">
+              <FormLabel>변경할 비밀번호</FormLabel>
+              <FormControl
+                type="password"
+                value={newPassword1}
+                maxLength={255}
+                placeholder="8자 이상, 영문 대/소문자, 숫자, 특수문자 포함"
+                onChange={(e) => setNewPassword1(e.target.value)}
+                className="bg-light border-0"
+                style={{ userSelect: "text" }}
+              />
+              {newPassword1 && !isPasswordValid && (
+                <FormText className="text-danger">
+                  비밀번호는 8자 이상, 영문 대소문자, 숫자, 특수문자를 포함해야
+                  합니다.
+                </FormText>
+              )}
+            </FormGroup>
+
+            <FormGroup className="mb-3" controlId="password4">
+              <FormLabel>변경할 비밀번호 확인</FormLabel>
+              <FormControl
+                type="password"
+                value={newPassword2}
+                maxLength={255}
+                placeholder="변경할 비밀번호를 다시 입력하세요"
+                onChange={(e) => setNewPassword2(e.target.value)}
+                className="bg-light border-0"
+                style={{ userSelect: "text" }}
+              />
+              {newPassword2 && !isPasswordMatch && (
+                <FormText className="text-danger">
+                  비밀번호가 일치하지 않습니다.
+                </FormText>
+              )}
+            </FormGroup>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="outline-secondary"
+              onClick={() => setPasswordModalShow(false)}
+            >
+              취소
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleChangePasswordButtonClick}
+              disabled={isChangePasswordDisabled}
+            >
+              변경
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </Col>
-
-      <Modal show={modalShow} onHide={() => setModalShow(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>회원 정보 수정 확인</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <FormGroup controlId="password1">
-            <FormLabel>암호</FormLabel>
-            <FormControl
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="현재 비밀번호를 입력하세요"
-            />
-          </FormGroup>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outline-dark" onClick={() => setModalShow(false)}>
-            취소
-          </Button>
-          <Button variant="primary" onClick={handleSaveButtonClick}>
-            저장
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal
-        show={passwordModalShow}
-        onHide={() => setPasswordModalShow(false)}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>비밀번호 변경</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <FormGroup className="mb-3" controlId="password2">
-            <FormLabel>현재 비밀번호</FormLabel>
-            <FormControl
-              type="password"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-            />
-          </FormGroup>
-
-          <FormGroup className="mb-3" controlId="password3">
-            <FormLabel>변경할 비밀번호</FormLabel>
-            <FormControl
-              type="password"
-              value={newPassword1}
-              maxLength={255}
-              placeholder="8자 이상, 영문 대/소문자, 숫자, 특수문자 포함"
-              onChange={(e) => setNewPassword1(e.target.value)}
-            />
-            {newPassword1 && !isPasswordValid && (
-              <FormText className="text-danger">
-                비밀번호는 8자 이상, 영문 대소문자, 숫자, 특수문자를 포함해야
-                합니다.
-              </FormText>
-            )}
-          </FormGroup>
-
-          <FormGroup className="mb-3" controlId="password4">
-            <FormLabel>변경할 비밀번호 확인</FormLabel>
-            <FormControl
-              type="password"
-              value={newPassword2}
-              maxLength={255}
-              placeholder="변경할 비밀번호를 다시 입력하세요"
-              onChange={(e) => setNewPassword2(e.target.value)}
-            />
-            {newPassword2 && !isPasswordMatch && (
-              <FormText className="text-danger">
-                비밀번호가 일치하지 않습니다.
-              </FormText>
-            )}
-          </FormGroup>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="outline-dark"
-            onClick={() => setPasswordModalShow(false)}
-          >
-            취소
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleChangePasswordButtonClick}
-            disabled={isChangePasswordDisabled}
-          >
-            변경
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </Row>
   );
 }

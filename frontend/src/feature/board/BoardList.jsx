@@ -96,76 +96,88 @@ export function BoardList() {
     <>
       <Row>
         <Col>
-          <h2 className="mb-4">글 목록</h2>
+          <br className="mb-4 h2" />
           {boardList.length > 0 ? (
             <Table
               striped
               hover
-              style={{ tableLayout: "fixed", width: "100%" }}
+              responsive
+              style={{
+                tableLayout: "fixed",
+                width: "100%",
+                fontSize: "0.95rem",
+              }}
+              className="align-middle"
             >
               <thead>
-                <tr>
+                <tr style={{ fontSize: "0.85rem", color: "#6c757d" }}>
                   <th style={{ width: "45px" }}>#</th>
                   <th style={{ width: "45px" }}>
-                    <FaThumbsUp
-                      size={14}
-                      className="text-secondary text-black"
-                    />
+                    <FaThumbsUp size={14} className="text-secondary" />
                   </th>
                   <th style={{ width: "95%" }}>제목</th>
-                  <th style={{ width: "30%" }}>작성자</th>
-                  <th style={{ width: "50%" }}>작성일시</th>
+                  <th style={{ width: "35%" }}>작성자</th>
+                  <th style={{ width: "70%" }}>작성일시</th>
                 </tr>
               </thead>
               <tbody>
                 {boardList.map((board) => (
                   <tr
                     key={board.id}
-                    style={{ cursor: "pointer" }}
+                    style={{
+                      cursor: "pointer",
+                      fontSize: "0.95rem",
+                      verticalAlign: "middle",
+                    }}
                     onClick={() => handleTableRowClick(board.id)}
                   >
-                    <td>{board.id}</td>
-                    <td>
-                      <span className="ms-1" style={{ fontSize: "0.85em" }}>
-                        {board.countLike}
-                      </span>
+                    <td className="text-muted">{board.id}</td>
+                    <td className="text-muted" style={{ fontSize: "0.85em" }}>
+                      {board.countLike}
                     </td>
                     <td>
-                      <div className="d-flex gap-2">
-                        <span>{board.title}</span>
-                        <span>
-                          {board.countComment > 0 && (
-                            <Badge bg="light" text="dark">
-                              <div className="d-flex gap-1">
-                                <FaRegComments />
-                                <span>{board.countComment}</span>
-                              </div>
-                            </Badge>
-                          )}
+                      <div className="d-flex gap-2 align-items-center">
+                        <span className="fw-semibold text-dark">
+                          {board.title}
                         </span>
-                        <span>
-                          {board.countFile > 0 && (
-                            <Badge bg="info">
-                              <div className="d-flex gap-1">
-                                <FaRegImages />
-                                <span>{board.countFile}</span>
-                              </div>
-                            </Badge>
-                          )}
-                        </span>
+
+                        {/* 댓글 수 뱃지 */}
+                        {board.countComment > 0 && (
+                          <Badge bg="light" text="dark">
+                            <div className="d-flex gap-1">
+                              <FaRegComments />
+                              <span>{board.countComment}</span>
+                            </div>
+                          </Badge>
+                        )}
+
+                        {/* 파일 수 뱃지 */}
+                        {board.countFile > 0 && (
+                          <Badge bg="info">
+                            <div className="d-flex gap-1">
+                              <FaRegImages />
+                              <span>{board.countFile}</span>
+                            </div>
+                          </Badge>
+                        )}
                       </div>
                     </td>
+
                     <td
+                      className="text-muted"
                       style={{
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
+                        fontSize: "0.85rem",
                       }}
                       title={board.nickName}
                     >
                       {board.nickName}
                     </td>
-                    <td>{board.timesAgo}</td>
+                    <td className="text-muted" style={{ fontSize: "0.85rem" }}>
+                      {board.timesAgo}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -179,54 +191,71 @@ export function BoardList() {
       </Row>
 
       {pageInfo && (
-        <Row className="my-3 justify-content-center mx-0">
+        <Row className="my-4 justify-content-center mx-0">
           <Col
             xs="auto"
             className="mx-auto"
             style={{ maxWidth: "500px", width: "100%" }}
           >
-            <Pagination className="justify-content-center mb-3 d-flex">
-              <Pagination.First
-                disabled={pageInfo.currentPageNumber === 1}
-                onClick={() => handlePageNumberClick(1)}
-              />
-              <Pagination.Prev
-                disabled={pageInfo.leftPageNumber <= 1}
-                onClick={() =>
-                  handlePageNumberClick(pageInfo.leftPageNumber - 10)
-                }
-              />
-              {pageNumbers.map((num) => (
-                <Pagination.Item
-                  key={num}
-                  active={pageInfo.currentPageNumber === num}
-                  onClick={() => handlePageNumberClick(num)}
-                >
-                  {num}
-                </Pagination.Item>
-              ))}
-              <Pagination.Next
-                disabled={pageInfo.rightPageNumber >= pageInfo.totalPages}
-                onClick={() =>
-                  handlePageNumberClick(pageInfo.rightPageNumber + 1)
-                }
-              />
-              <Pagination.Last
-                disabled={pageInfo.currentPageNumber === pageInfo.totalPages}
-                onClick={() => handlePageNumberClick(pageInfo.totalPages)}
-              />
-            </Pagination>
-
-            <Form onSubmit={handleSearchFormSubmit} className="d-flex">
-              <InputGroup style={{ width: "100%" }}>
-                <FormControl
-                  value={keywords}
-                  onChange={(e) => setKeywords(e.target.value)}
-                  placeholder="(제목+내용)"
+            <div className="d-flex flex-column gap-3 align-items-center">
+              {/* 🔵 Pagination 버튼 */}
+              <Pagination className="mb-2" size="sm">
+                <Pagination.First
+                  disabled={pageInfo.currentPageNumber === 1}
+                  onClick={() => handlePageNumberClick(1)}
+                  className="rounded"
                 />
-                <Button type="submit">검색</Button>
-              </InputGroup>
-            </Form>
+                <Pagination.Prev
+                  disabled={pageInfo.leftPageNumber <= 1}
+                  onClick={() =>
+                    handlePageNumberClick(pageInfo.leftPageNumber - 10)
+                  }
+                  className="rounded"
+                />
+                {pageNumbers.map((num) => (
+                  <Pagination.Item
+                    key={num}
+                    active={pageInfo.currentPageNumber === num}
+                    onClick={() => handlePageNumberClick(num)}
+                    className="rounded"
+                    variant={
+                      pageInfo.currentPageNumber === num
+                        ? "primary"
+                        : "outline-secondary"
+                    }
+                  >
+                    {num}
+                  </Pagination.Item>
+                ))}
+                <Pagination.Next
+                  disabled={pageInfo.rightPageNumber >= pageInfo.totalPages}
+                  onClick={() =>
+                    handlePageNumberClick(pageInfo.rightPageNumber + 1)
+                  }
+                  className="rounded"
+                />
+                <Pagination.Last
+                  disabled={pageInfo.currentPageNumber === pageInfo.totalPages}
+                  onClick={() => handlePageNumberClick(pageInfo.totalPages)}
+                  className="rounded"
+                />
+              </Pagination>
+
+              {/* 🔍 검색창 */}
+              <Form onSubmit={handleSearchFormSubmit} style={{ width: "100%" }}>
+                <InputGroup size="sm">
+                  <FormControl
+                    placeholder="(제목+내용)"
+                    value={keywords}
+                    onChange={(e) => setKeywords(e.target.value)}
+                    className="rounded-start"
+                  />
+                  <Button type="submit" className="rounded-end">
+                    검색
+                  </Button>
+                </InputGroup>
+              </Form>
+            </div>
           </Col>
         </Row>
       )}
