@@ -13,12 +13,18 @@ import com.example.backend.like.repository.BoardLikeRepository;
 import com.example.backend.member.entity.Member;
 import com.example.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -40,6 +46,28 @@ public class BoardService {
     private final BoardFileRepository boardFileRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final CommentRepository commentRepository;
+    private final S3Client s3Client;
+
+    @Value("${image.prefix}")
+    private String imagePrefix;
+    @Value("${aws.s3.bucket.name}")
+    private String bucketName;
+
+    private void uploadFile(MultipartFile file, String objectKey) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest
+                .builder().bucket(bucketName).key(objectKey).build();
+        s3Client.deleteObject(deleteObjectRequest);
+    }
+
+    private void deleteFile(MultipartFile file, String objectKey) {
+        try {
+            PutObjectRequest putObjectRequest = PutObjectRequest
+                    .builder().bucket(bucketName).key(objectKey).acl(ObjectCannedACL.PUBLIC_READ).build();
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        } catch (Exception e) {
+            throw new RuntimeException("파일 전송이 실패하였습니다.");
+        }
+    }
 
     public void add(BoardAddForm dto, Authentication authentication) {
         String email = Optional.ofNullable(authentication)
@@ -72,27 +100,30 @@ public class BoardService {
                     boardFile.setId(id);
                     boardFileRepository.save(boardFile);
 
-                    File folder = new File("C:/Temp/prj3/boardFile/" + board.getId());
-                    if (!folder.exists()) {
-                        folder.mkdirs();
-                    }
+//                    File folder = new File("C:/Temp/prj3/boardFile/" + board.getId());
+//                    if (!folder.exists()) {
+//                        folder.mkdirs();
+//                    }
 
-                    try {
-                        File outputFile = new File(folder, Objects.requireNonNull(file.getOriginalFilename()));
-                        try (BufferedInputStream bi = new BufferedInputStream(file.getInputStream());
-                             BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(outputFile))) {
+                    String objectKey = "prj3/board/" + board.getId() + "/" + file.getOriginalFilename();
+                    uploadFile(file, objectKey);
 
-                            byte[] b = new byte[1024];
-                            int len;
-                            while ((len = bi.read(b)) != -1) {
-                                bo.write(b, 0, len);
-                            }
-                            bo.flush();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new RuntimeException(e);
-                    }
+//                    try {
+//                        File outputFile = new File(folder, Objects.requireNonNull(file.getOriginalFilename()));
+//                        try (BufferedInputStream bi = new BufferedInputStream(file.getInputStream());
+//                             BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(outputFile))) {
+//
+//                            byte[] b = new byte[1024];
+//                            int len;
+//                            while ((len = bi.read(b)) != -1) {
+//                                bo.write(b, 0, len);
+//                            }
+//                            bo.flush();
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        throw new RuntimeException(e);
+//                    }
                 }
             }
         }
@@ -145,13 +176,9 @@ public class BoardService {
             throw new RuntimeException("본인만 삭제할 수 있습니다.");
         }
 
-        // ✅ 댓글 먼저 삭제
-        commentRepository.deleteByBoardId(id);  // 게시물에 달린 댓글 삭제
+        commentRepository.deleteByBoardId(id);
+        boardLikeRepository.deleteByBoardId(id);
 
-        // ✅ 좋아요 삭제
-        boardLikeRepository.deleteByBoardId(id);  // 게시글을 참조하는 좋아요 삭제
-
-        // ✅ 첨부파일 실제 파일 삭제
         for (BoardFile file : board.getFiles()) {
             File target = new File("C:/Temp/prj3/boardFile/" + id + "/" + file.getId().getName());
             if (target.exists()) {
@@ -160,13 +187,11 @@ public class BoardService {
             }
         }
 
-        // ✅ 폴더 자체도 삭제 시도 (비어있을 경우)
         File dir = new File("C:/Temp/prj3/boardFile/" + id);
         if (dir.exists() && dir.isDirectory()) {
             dir.delete(); // 내부 비어 있을 경우만 성공
         }
 
-        // ✅ 게시글 삭제 (파일, 댓글 등 cascade 삭제 포함)
         boardRepository.delete(board);
     }
 
