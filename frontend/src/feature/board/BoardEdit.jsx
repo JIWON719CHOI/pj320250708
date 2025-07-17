@@ -38,7 +38,6 @@ export function BoardEdit() {
   const [deleteFileNames, setDeleteFileNames] = useState([]);
 
   const { user } = useContext(AuthenticationContext);
-
   const navigate = useNavigate();
 
   const formattedInsertedAt = board.insertedAt

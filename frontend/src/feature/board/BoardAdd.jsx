@@ -26,6 +26,8 @@ export function BoardAdd() {
   const { user } = useContext(AuthenticationContext);
   const navigate = useNavigate();
 
+  if (!user) return null;
+
   const isValid =
     title.trim() !== "" && (content.trim() !== "" || files.length > 0);
 

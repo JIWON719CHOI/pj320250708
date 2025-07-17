@@ -180,32 +180,52 @@ export function BoardDetail() {
               <div className="d-flex">
                 {hasAccess(board.authorEmail) && (
                   <>
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={<Tooltip id="tooltip-delete">삭제</Tooltip>}
-                    >
-                      <Button
-                        onClick={() => setModalShow(true)}
-                        className="me-2 d-flex align-items-center gap-1"
-                        variant="outline-danger"
-                        title="게시물 삭제"
+                    <div style={{ position: "relative" }}>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip id="tooltip-delete">삭제</Tooltip>}
+                        delay={{ show: 250, hide: 400 }}
+                        containerPadding={10}
+                        popperConfig={{
+                          modifiers: [
+                            { name: "preventOverflow", enabled: false },
+                            { name: "flip", enabled: false },
+                          ],
+                        }}
                       >
-                        <FaTrashAlt />
-                      </Button>
-                    </OverlayTrigger>
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={<Tooltip id="tooltip-edit">수정</Tooltip>}
-                    >
-                      <Button
-                        variant="outline-info"
-                        className="d-flex align-items-center gap-1"
-                        onClick={() => navigate(`/board/edit?id=${board.id}`)}
-                        title="게시물 수정"
+                        <Button
+                          onClick={() => setModalShow(true)}
+                          className="me-2 d-flex align-items-center gap-1"
+                          variant="outline-danger"
+                          title="게시물 삭제"
+                        >
+                          <FaTrashAlt />
+                        </Button>
+                      </OverlayTrigger>
+                    </div>
+                    <div style={{ position: "relative" }}>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip id="tooltip-edit">수정</Tooltip>}
+                        delay={{ show: 250, hide: 400 }}
+                        containerPadding={10}
+                        popperConfig={{
+                          modifiers: [
+                            { name: "preventOverflow", enabled: false },
+                            { name: "flip", enabled: false },
+                          ],
+                        }}
                       >
-                        <FaEdit />
-                      </Button>
-                    </OverlayTrigger>
+                        <Button
+                          variant="outline-info"
+                          className="d-flex align-items-center gap-1"
+                          onClick={() => navigate(`/board/edit?id=${board.id}`)}
+                          title="게시물 수정"
+                        >
+                          <FaEdit />
+                        </Button>
+                      </OverlayTrigger>
+                    </div>
                   </>
                 )}
               </div>
