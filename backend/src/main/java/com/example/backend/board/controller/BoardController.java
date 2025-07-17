@@ -24,7 +24,7 @@ public class BoardController {
     // ✅ 게시글 추가
     @PostMapping("/add")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> add(BoardAddForm dto, Authentication authentication) {
+    public ResponseEntity<?> add(@ModelAttribute BoardAddForm dto, Authentication authentication) {
         boolean result = boardService.validateForAdd(dto);
         if (result) {
             boardService.add(dto, authentication);
@@ -60,14 +60,7 @@ public class BoardController {
     // ✅ 수정 (본인만 가능)
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> update(
-            @PathVariable Integer id,
-            @RequestParam("title") String title,
-            @RequestParam("content") String content,
-            @RequestParam(value = "files", required = false) List<MultipartFile> files,
-            @RequestParam(value = "deleteFileNames", required = false) List<String> deleteFileNames,
-            Authentication authentication
-    ) {
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestParam("title") String title, @RequestParam("content") String content, @RequestParam(value = "files", required = false) List<MultipartFile> files, @RequestParam(value = "deleteFileNames", required = false) List<String> deleteFileNames, Authentication authentication) {
         BoardAddForm form = new BoardAddForm();
         form.setId(id);
         form.setTitle(title);
@@ -75,16 +68,12 @@ public class BoardController {
         form.setFiles(files); // 새로 추가된 파일
 
         if (!boardService.validateForAdd(form)) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")
-            ));
+            return ResponseEntity.badRequest().body(Map.of("message", Map.of("type", "error", "text", "입력한 내용이 유효하지 않습니다.")));
         }
 
         boardService.updateWithFiles(id, form, deleteFileNames, authentication);
 
-        return ResponseEntity.ok(Map.of(
-                "message", Map.of("type", "success", "text", id + "번 게시물이 수정되었습니다.")
-        ));
+        return ResponseEntity.ok(Map.of("message", Map.of("type", "success", "text", id + "번 게시물이 수정되었습니다.")));
     }
 
     @GetMapping("/latest")

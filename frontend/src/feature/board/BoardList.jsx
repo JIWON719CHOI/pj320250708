@@ -120,7 +120,7 @@ export function BoardList() {
                   <th style={{ width: "45px" }}>
                     <FaThumbsUp size={14} className="text-secondary" />
                   </th>
-                  <th style={{ width: "95%" }}>제목</th>
+                  <th style={{ width: "100%" }}>제목</th>
                   <th style={{ width: "35%" }}>작성자</th>
                   <th style={{ width: "50%" }}>작성일시</th>
                 </tr>

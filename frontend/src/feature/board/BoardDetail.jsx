@@ -50,7 +50,7 @@ export function BoardDetail() {
         if (message) {
           toast(message.text, { type: message.type });
         }
-        navigate("/");
+        navigate("/board/list");
       })
       .catch(() => {
         toast.warning("게시물이 삭제되지 않았습니다.");

@@ -98,6 +98,14 @@ export function BoardLayout() {
               <Accordion.Header>집에 가고싶나요?</Accordion.Header>
               <Accordion.Body>네.</Accordion.Body>
             </Accordion.Item>
+            <Accordion.Item eventKey="3">
+              <Accordion.Header>너무 추워</Accordion.Header>
+              <Accordion.Body>나는 비오는 날이 싫다고</Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="4">
+              <Accordion.Header>배고프다</Accordion.Header>
+              <Accordion.Body>다이어트는 내일부터...</Accordion.Body>
+            </Accordion.Item>
           </Accordion>
         </Col>
       </Row>
