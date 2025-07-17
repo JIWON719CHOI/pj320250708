@@ -94,8 +94,13 @@ export function BoardList() {
 
   return (
     <>
-      <Row>
-        <Col>
+      <Row className="justify-content-center">
+        <Col
+          xs={12}
+          md={10}
+          lg={8}
+          style={{ maxWidth: "900px", margin: "0 auto" }}
+        >
           <br className="mb-4 h2" />
           {boardList.length > 0 ? (
             <Table
@@ -117,7 +122,7 @@ export function BoardList() {
                   </th>
                   <th style={{ width: "95%" }}>제목</th>
                   <th style={{ width: "35%" }}>작성자</th>
-                  <th style={{ width: "70%" }}>작성일시</th>
+                  <th style={{ width: "50%" }}>작성일시</th>
                 </tr>
               </thead>
               <tbody>

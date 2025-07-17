@@ -58,8 +58,8 @@ export function BoardListMini() {
             <FaThumbsUp size={13} />
           </th>
           <th>제목</th>
-          <th style={{ width: "90px" }}>작성자</th>
-          <th style={{ width: "150px" }}>작성일</th>
+          <th style={{ width: "80px" }}>작성자</th>
+          <th style={{ width: "100px" }}>작성일</th>
         </tr>
       </thead>
       <tbody>

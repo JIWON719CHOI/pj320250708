@@ -36,8 +36,8 @@ public class BoardListDto {
             long minutes = seconds / 60;
             return minutes + "분 전";
         } else {
-            // 1시간 이상부터는 절대 시간 표시 (yyyy-MM-dd-HH-mm)
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            // 1시간 이상부터는 절대 시간 표시 (yyyy-MM-dd)
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             return insertedAt.format(formatter);
         }
     }

@@ -1,4 +1,4 @@
-import { Accordion, Carousel, Tab, Tabs } from "react-bootstrap";
+import { Accordion, Carousel, Col, Row, Tab, Tabs } from "react-bootstrap";
 import { useState } from "react";
 import { BoardListMini } from "./BoardListMini.jsx";
 import img1 from "../../assets/01.png";
@@ -67,33 +67,40 @@ export function BoardLayout() {
         </Carousel.Item>
       </Carousel>
 
-      {/* Tabs: 선택된 탭에만 BoardListMini 렌더링 */}
-      <Tabs
-        activeKey={activeTab}
-        onSelect={(k) => setActiveTab(k)}
-        className="my-4"
-      >
-        <Tab eventKey="1" title="공지사항">
-          <div className="p-3">공지사항이 없습니다.</div>
-        </Tab>
-        <Tab eventKey="2" title="최신글">
-          <div className="p-3">
-            {activeTab === "2" && <BoardListMini />} {/* 선택될 때만 렌더링 */}
-          </div>
-        </Tab>
-      </Tabs>
+      {/* Row로 탭과 아코디언을 좌우 배치 */}
+      <Row className="my-4">
+        {/* 탭 영역 - 왼쪽 */}
+        <Col xs={12} md={7}>
+          <Tabs
+            activeKey={activeTab}
+            onSelect={(k) => setActiveTab(k)}
+            className="mb-3"
+          >
+            <Tab eventKey="1" title="공지사항">
+              <div className="p-3">공지사항이 없습니다.</div>
+            </Tab>
+            <Tab eventKey="2" title="최신글">
+              <div className="p-3">
+                {activeTab === "2" && <BoardListMini />}
+              </div>
+            </Tab>
+          </Tabs>
+        </Col>
 
-      {/* Accordion은 트래픽과 무관하므로 유지 */}
-      <Accordion defaultActiveKey="0" className="my-3">
-        <Accordion.Item eventKey="1">
-          <Accordion.Header>지금 피곤한가요?</Accordion.Header>
-          <Accordion.Body>네.</Accordion.Body>
-        </Accordion.Item>
-        <Accordion.Item eventKey="2">
-          <Accordion.Header>집에 가고싶나요?</Accordion.Header>
-          <Accordion.Body>네.</Accordion.Body>
-        </Accordion.Item>
-      </Accordion>
+        {/* 아코디언 영역 - 오른쪽 */}
+        <Col xs={12} md={5}>
+          <Accordion defaultActiveKey="0">
+            <Accordion.Item eventKey="1">
+              <Accordion.Header>지금 피곤한가요?</Accordion.Header>
+              <Accordion.Body>네.</Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="2">
+              <Accordion.Header>집에 가고싶나요?</Accordion.Header>
+              <Accordion.Body>네.</Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+        </Col>
+      </Row>
     </div>
   );
 }

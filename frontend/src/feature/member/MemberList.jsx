@@ -36,8 +36,13 @@ export function MemberList() {
   }
 
   return (
-    <Row className="mt-4">
-      <Col>
+    <Row className="justify-content-center">
+      <Col
+        xs={12}
+        md={10}
+        lg={8}
+        style={{ maxWidth: "900px", margin: "0 auto" }}
+      >
         <h4 className="mb-4 fw-bold text-dark">회원 목록</h4>
 
         {memberList.length > 0 ? (
