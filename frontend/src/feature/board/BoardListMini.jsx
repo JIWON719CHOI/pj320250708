@@ -71,9 +71,30 @@ export function BoardListMini() {
           >
             <td className="text-muted">{board.id}</td>
             <td className="text-muted">{board.countLike}</td>
-            <td className="text-dark">
-              <div className="d-flex gap-2 align-items-center">
-                <span className="text-truncate">{board.title}</span>
+            <td
+              className="text-dark"
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <div
+                className="d-flex gap-2 align-items-center"
+                style={{ overflow: "hidden" }}
+              >
+                <span
+                  style={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    display: "inline-block",
+                    maxWidth: "100%",
+                  }}
+                >
+                  {board.title}
+                </span>
+
                 {board.countComment > 0 && (
                   <Badge bg="light" text="dark">
                     <div className="d-flex align-items-center gap-1">

@@ -6,10 +6,8 @@ import {
   FormGroup,
   ListGroup,
   Modal,
-  OverlayTrigger,
   Row,
   Spinner,
-  Tooltip,
 } from "react-bootstrap";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
@@ -165,7 +163,6 @@ export function BoardEdit() {
                     }}
                   />
                 </FormGroup>
-
                 {Array.isArray(board.files) && board.files.length > 0 && (
                   <div className="mb-4">
                     <ListGroup>
@@ -176,29 +173,46 @@ export function BoardEdit() {
                             key={idx}
                             className="d-flex justify-content-between align-items-center"
                           >
-                            <span className="text-truncate d-flex align-items-center gap-2">
-                              <FaFileAlt /> {fileName}
-                            </span>
-                            <div className="d-flex gap-2">
-                              <Button
-                                variant="outline-primary"
-                                size="sm"
-                                href={file}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-1 d-flex align-items-center justify-content-center"
-                              >
-                                <FaDownload />
-                              </Button>
+                            {/* 미리보기 이미지 왼쪽에 배치 */}
+                            {fileName.match(/\.(jpg|jpeg|png|gif)$/i) && (
+                              <img
+                                src={file}
+                                alt={fileName}
+                                style={{
+                                  width: "50px",
+                                  height: "50px",
+                                  objectFit: "cover",
+                                  marginRight: "10px", // 이미지와 파일명 간의 간격 조정
+                                }}
+                              />
+                            )}
 
-                              <Button
-                                variant="outline-danger"
-                                size="sm"
-                                className="p-1 d-flex align-items-center justify-content-center"
-                                onClick={() => handleDeleteFile(idx)}
-                              >
-                                <FaTrashAlt />
-                              </Button>
+                            {/* 파일명과 삭제 버튼 오른쪽에 배치 */}
+                            <div className="d-flex justify-content-between align-items-center w-100">
+                              <span className="text-truncate d-flex align-items-center gap-2">
+                                <FaFileAlt /> {fileName}
+                              </span>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="outline-primary"
+                                  size="sm"
+                                  href={file}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1 d-flex align-items-center justify-content-center"
+                                >
+                                  <FaDownload />
+                                </Button>
+
+                                <Button
+                                  variant="outline-danger"
+                                  size="sm"
+                                  className="p-1 d-flex align-items-center justify-content-center"
+                                  onClick={() => handleDeleteFile(idx)}
+                                >
+                                  <FaTrashAlt />
+                                </Button>
+                              </div>
                             </div>
                           </ListGroup.Item>
                         );
@@ -215,20 +229,37 @@ export function BoardEdit() {
                           key={idx}
                           className="d-flex justify-content-between align-items-center"
                         >
-                          <span className="text-truncate d-flex align-items-center gap-2">
-                            <FaFileAlt /> {file.name}
-                          </span>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() =>
-                              setNewFiles((prev) =>
-                                prev.filter((_, i) => i !== idx),
-                              )
-                            }
-                          >
-                            <FaTrashAlt />
-                          </Button>
+                          {/* 미리보기 이미지 왼쪽에 배치 */}
+                          {file.name.match(/\.(jpg|jpeg|png|gif)$/i) && (
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={file.name}
+                              style={{
+                                width: "50px",
+                                height: "50px",
+                                objectFit: "cover",
+                                marginRight: "10px", // 이미지와 파일명 간의 간격 조정
+                              }}
+                            />
+                          )}
+
+                          {/* 파일명과 삭제 버튼 오른쪽에 배치 */}
+                          <div className="d-flex justify-content-between align-items-center w-100">
+                            <span className="text-truncate d-flex align-items-center gap-2">
+                              <FaFileAlt /> {file.name}
+                            </span>
+                            <Button
+                              variant="outline-danger"
+                              size="sm"
+                              onClick={() =>
+                                setNewFiles((prev) =>
+                                  prev.filter((_, i) => i !== idx),
+                                )
+                              }
+                            >
+                              <FaTrashAlt />
+                            </Button>
+                          </div>
                         </ListGroup.Item>
                       ))}
                     </ListGroup>

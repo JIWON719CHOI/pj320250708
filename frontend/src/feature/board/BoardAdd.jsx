@@ -8,9 +8,7 @@ import {
   Col,
   FormControl,
   FormGroup,
-  FormLabel,
   ListGroup,
-  ListGroupItem,
   Modal,
   Row,
   Spinner,
@@ -31,10 +29,21 @@ export function BoardAdd() {
   const isValid =
     title.trim() !== "" && (content.trim() !== "" || files.length > 0);
 
+  // 파일 첨부 시 처리하는 함수
   const handleFileChange = (e) => {
-    setFiles((prev) => [...prev, ...Array.from(e.target.files)]);
+    const selectedFiles = Array.from(e.target.files);
+    setFiles((prevFiles) => {
+      const newFiles = selectedFiles.map((file) => ({
+        file,
+        previewUrl: file.type.startsWith("image/")
+          ? URL.createObjectURL(file)
+          : null, // 이미지 파일일 경우 미리보기 URL 생성
+      }));
+      return [...prevFiles, ...newFiles];
+    });
   };
 
+  // 파일 삭제 시 처리하는 함수
   const handleFileRemove = (idx) => {
     setFiles(files.filter((_, i) => i !== idx));
   };
@@ -52,7 +61,7 @@ export function BoardAdd() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    files.forEach((file) => formData.append("files", file));
+    files.forEach((fileObj) => formData.append("files", fileObj.file));
 
     axios
       .post("/api/board/add", formData, {
@@ -118,23 +127,40 @@ export function BoardAdd() {
             {files.length > 0 && (
               <div className="mb-4">
                 <ListGroup>
-                  {files.map((file, idx) => (
+                  {files.map((fileObj, idx) => (
                     <ListGroup.Item
                       key={idx}
                       className="d-flex justify-content-between align-items-center"
                     >
-                      <span className="text-truncate d-flex align-items-center gap-2">
-                        <FaFileAlt /> {file.name}
-                      </span>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        className="p-1 d-flex"
-                        onClick={() => handleFileRemove(idx)}
-                        disabled={isProcessing}
-                      >
-                        <FaTrashAlt />
-                      </Button>
+                      {/* 미리보기 이미지 왼쪽에 배치 */}
+                      {fileObj.previewUrl && (
+                        <img
+                          src={fileObj.previewUrl}
+                          alt={fileObj.file.name}
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            objectFit: "cover",
+                            marginRight: "10px", // 이미지와 파일명 간의 간격 조정
+                          }}
+                        />
+                      )}
+
+                      {/* 파일명과 삭제 버튼 오른쪽에 배치 */}
+                      <div className="d-flex justify-content-between align-items-center w-100">
+                        <span className="text-truncate d-flex align-items-center gap-2">
+                          <FaFileAlt /> {fileObj.file.name}
+                        </span>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          className="p-1 d-flex"
+                          onClick={() => handleFileRemove(idx)}
+                          disabled={isProcessing}
+                        >
+                          <FaTrashAlt />
+                        </Button>
+                      </div>
                     </ListGroup.Item>
                   ))}
                 </ListGroup>

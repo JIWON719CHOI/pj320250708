@@ -67,5 +67,33 @@ UPDATE member
 SET password = '$2a$10$gdx4VSoqzsQ.AOHLIfbr2..zcar8fELPhWhuNiepTQns9GXi7h93u'
 WHERE email = 'admin@email.com';
 
+-- board_like 테이블에 foreign key constraint에 ON DELETE CASCADE 추가
+ALTER TABLE board_like
+    DROP FOREIGN KEY board_like_ibfk_1; -- 기존 외래 키 제약을 삭제
+
+ALTER TABLE board_like
+    ADD CONSTRAINT board_like_ibfk_1 FOREIGN KEY (board_id) REFERENCES board (id) ON DELETE CASCADE;
+
+SHOW CREATE TABLE board_like;
+
+ALTER TABLE comment
+    DROP FOREIGN KEY comment_ibfk_2; -- 기존 외래 키 제약 삭제
+
+ALTER TABLE comment
+    ADD CONSTRAINT comment_ibfk_2 FOREIGN KEY (board_id) REFERENCES board (id) ON DELETE CASCADE;
+
+SHOW CREATE TABLE comment;
+
+-- 외래 키 제약 삭제
+ALTER TABLE board_file
+    DROP FOREIGN KEY board_file_ibfk_1;
+
+-- 외래 키 제약에 ON DELETE CASCADE 추가
+ALTER TABLE board_file
+    ADD CONSTRAINT board_file_ibfk_1 FOREIGN KEY (board_id) REFERENCES board (id) ON DELETE CASCADE;
+
+
+
+
 
 

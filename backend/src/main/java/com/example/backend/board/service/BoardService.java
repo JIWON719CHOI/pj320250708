@@ -24,7 +24,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,9 +37,9 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
-    private final CommentRepository commentRepository;
     private final BoardFileRepository boardFileRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final CommentRepository commentRepository;
 
     public void add(BoardAddForm dto, Authentication authentication) {
         String email = Optional.ofNullable(authentication)
@@ -132,7 +135,7 @@ public class BoardService {
         // ✅ 2. 새로 업로드된 파일 저장
         saveFiles(board, dto);
     }
-    
+
     public void deleteById(Integer id, Authentication authentication) {
         String email = authentication.getName();
         Board board = boardRepository.findById(id)
@@ -142,8 +145,11 @@ public class BoardService {
             throw new RuntimeException("본인만 삭제할 수 있습니다.");
         }
 
-        // ✅ 좋아요 먼저 삭제
-        boardLikeRepository.deleteByBoardId(id);
+        // ✅ 댓글 먼저 삭제
+        commentRepository.deleteByBoardId(id);  // 게시물에 달린 댓글 삭제
+
+        // ✅ 좋아요 삭제
+        boardLikeRepository.deleteByBoardId(id);  // 게시글을 참조하는 좋아요 삭제
 
         // ✅ 첨부파일 실제 파일 삭제
         for (BoardFile file : board.getFiles()) {
@@ -164,28 +170,10 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
-
-    public void update(BoardDto dto, Authentication authentication) {
-        String email = authentication.getName();
-        Board board = boardRepository.findById(dto.getId())
-                .orElseThrow(() -> new RuntimeException("해당 게시물이 없습니다."));
-        if (!board.getAuthor().getEmail().equals(email)) {
-            throw new RuntimeException("본인 게시물만 수정할 수 있습니다.");
-        }
-        board.setTitle(dto.getTitle().trim());
-        board.setContent(dto.getContent().trim());
-        boardRepository.save(board);
-    }
-
     public boolean validateForAdd(BoardAddForm dto) {
         if (dto.getTitle() == null || dto.getTitle().trim().isBlank()) return false;
         if (dto.getContent() == null || dto.getContent().trim().isBlank()) return false;
         return true;
-    }
-
-    public boolean validate(BoardDto dto) {
-        return dto.getTitle() != null && !dto.getTitle().trim().isBlank()
-                && dto.getContent() != null && !dto.getContent().trim().isBlank();
     }
 
     public Map<String, Object> list(String keyword, Integer pageNumber) {

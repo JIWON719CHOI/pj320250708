@@ -137,7 +137,15 @@ export function BoardList() {
                     </td>
                     <td>
                       <div className="d-flex gap-2 align-items-center">
-                        <span className="fw-semibold text-dark">
+                        <span
+                          className="fw-semibold text-dark"
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            maxWidth: "calc(100% - 40px)", // 필요에 따라 조정
+                          }}
+                        >
                           {board.title}
                         </span>
 

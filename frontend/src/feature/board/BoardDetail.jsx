@@ -17,7 +17,7 @@ import {
 import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 import { CommentContainer } from "../comment/CommentContainer.jsx";
 import { LikeContainer } from "../like/LikeContainer.jsx";
-import { FaDownload, FaTrashAlt, FaEdit } from "react-icons/fa";
+import { FaDownload, FaEdit, FaTrashAlt } from "react-icons/fa";
 
 export function BoardDetail() {
   const [board, setBoard] = useState(null);
