@@ -5,6 +5,7 @@ import com.example.backend.board.entity.Board;
 import com.example.backend.member.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +21,7 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
                         b.insertedAt,
                         COUNT(DISTINCT c),
                         COUNT(DISTINCT l),
-                                    COUNT(DISTINCT f))
+                        COUNT(DISTINCT f))
             FROM Board b JOIN Member m
                         ON b.author.email = m.email
                         LEFT JOIN Comment c
@@ -35,7 +36,7 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
             GROUP BY b.id
             ORDER BY b.id DESC
             """)
-    Page<BoardListDto> findAllBy(String keyword, PageRequest pageRequest);
+    Page<BoardListDto> findAllBy(String keyword, Pageable pageable); // ✅ 이렇게 수정
 
     @Modifying
     @Transactional
