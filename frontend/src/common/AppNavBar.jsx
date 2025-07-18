@@ -11,7 +11,7 @@ export function AppNavBar() {
       <Container className="d-flex align-items-center">
         {/* 1. 로고 */}
         <Navbar.Brand as={Link} to="/" className="fs-3 fw-bold me-4">
-          PRJ3
+          💅
         </Navbar.Brand>
 
         {/* 2. 로그인/닉네임 + 햄버거 토글 (항상 고정, Collapse 밖) */}

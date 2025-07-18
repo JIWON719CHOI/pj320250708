@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Button,
@@ -14,6 +14,7 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { AuthenticationContext } from "../../common/AuthenticationContextProvider.jsx";
 
 export function MemberEdit() {
   // 상태 정의
@@ -26,6 +27,8 @@ export function MemberEdit() {
   const [newPassword2, setNewPassword2] = useState("");
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { hasAccess } = useContext(AuthenticationContext);
+  const isSelf = member ? hasAccess(member.email) : false;
 
   // 정규식
   const passwordRegex =
@@ -157,6 +160,7 @@ export function MemberEdit() {
                 }
                 className="bg-light border-0"
                 style={{ userSelect: "text" }}
+                disabled={!isSelf}
               />
               {member.nickName && !isNickNameValid && (
                 <FormText className="text-danger">
@@ -178,6 +182,7 @@ export function MemberEdit() {
                   resize: "none",
                   userSelect: "text",
                 }}
+                disabled={!isSelf}
               />
             </FormGroup>
 
@@ -192,30 +197,32 @@ export function MemberEdit() {
             </FormGroup>
 
             {/* 버튼 3개 - 탈퇴, 수정, 로그아웃과 같은 스타일과 위치 */}
-            <div className="d-flex justify-content-start gap-2">
-              <Button
-                variant="outline-secondary"
-                onClick={() => navigate(-1)}
-                className="d-flex align-items-center gap-1"
-              >
-                취소
-              </Button>
-              <Button
-                variant="primary"
-                disabled={isSaveDisabled}
-                onClick={() => setModalShow(true)}
-                className="d-flex align-items-center gap-1"
-              >
-                저장
-              </Button>
-              <Button
-                variant="outline-info"
-                onClick={() => setPasswordModalShow(true)}
-                className="d-flex align-items-center gap-1"
-              >
-                비밀번호 변경
-              </Button>
-            </div>
+            {hasAccess(member.email) && (
+              <div className="d-flex justify-content-start gap-2">
+                <Button
+                  variant="outline-secondary"
+                  onClick={() => navigate(-1)}
+                  className="d-flex align-items-center gap-1"
+                >
+                  취소
+                </Button>
+                <Button
+                  variant="primary"
+                  disabled={isSaveDisabled}
+                  onClick={() => setModalShow(true)}
+                  className="d-flex align-items-center gap-1"
+                >
+                  저장
+                </Button>
+                <Button
+                  variant="outline-info"
+                  onClick={() => setPasswordModalShow(true)}
+                  className="d-flex align-items-center gap-1"
+                >
+                  비밀번호 변경
+                </Button>
+              </div>
+            )}
           </Card.Body>
         </Card>
 
