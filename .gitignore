@@ -6145,3 +6145,7 @@
 /node_modules/.package-lock.json
 /package.json
 /package-lock.json
+
+/.idea/
+/backend/src/main/resources/secret/
+/backend/src/main/resources/static/
